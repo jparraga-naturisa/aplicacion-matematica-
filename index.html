@@ -1,0 +1,1859 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aprende Ecuaciones y Funciones desde Problemas</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1: #fcfcfb;
+    --page: #f9f9f7;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --baseline: #c3c2b7;
+    --series-1: #2a78d6;
+    --series-2: #eb6834;
+    --series-3: #1baf7a;
+    --good: #0ca30c;
+    --good-bg: #e6f6e6;
+    --critical: #d03b3b;
+    --critical-bg: #fbe9e9;
+    --warning: #fab219;
+    --warning-bg: #fef5e2;
+    --border: rgba(11,11,11,0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-1: #1a1a19;
+      --page: #0d0d0d;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --muted: #898781;
+      --grid: #2c2c2a;
+      --baseline: #383835;
+      --series-1: #3987e5;
+      --series-2: #d95926;
+      --series-3: #199e70;
+      --good: #0ca30c;
+      --good-bg: #123312;
+      --critical: #e66767;
+      --critical-bg: #3a1414;
+      --warning: #fab219;
+      --warning-bg: #3a2c0c;
+      --border: rgba(255,255,255,0.10);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--page);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  #app { max-width: 880px; margin: 0 auto; padding: 24px 16px 64px; }
+
+  .demo-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    color: var(--series-1);
+    background: color-mix(in srgb, var(--series-1) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--series-1) 30%, transparent);
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin-bottom: 10px;
+  }
+  header.top { margin-bottom: 28px; }
+  header.top h1 { font-size: 26px; margin: 0 0 6px; line-height: 1.25; }
+  header.top p.sub { color: var(--text-secondary); margin: 0; font-size: 15px; }
+
+  .overall-progress {
+    margin-top: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .overall-progress .bar {
+    flex: 1; height: 8px; border-radius: 999px; background: var(--grid); overflow: hidden;
+  }
+  .overall-progress .bar > div {
+    height: 100%; background: var(--series-1); border-radius: 999px;
+    transition: width .3s ease;
+  }
+  .overall-progress .label { font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
+
+  .cards-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    cursor: pointer;
+    text-align: left;
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+  .card .icon { font-size: 26px; margin-bottom: 8px; display:block; }
+  .card h3 { margin: 0 0 6px; font-size: 17px; }
+  .card p { margin: 0 0 10px; color: var(--text-secondary); font-size: 13.5px; line-height: 1.4; }
+  .card .progress-line { font-size: 12.5px; color: var(--muted); display:flex; align-items:center; gap:6px; }
+  .mini-bar { flex:1; height:5px; border-radius:999px; background: var(--grid); overflow:hidden; }
+  .mini-bar > div { height:100%; background: var(--series-1); border-radius:999px; }
+
+  .create-card { border-style: dashed; border-color: color-mix(in srgb, var(--series-1) 45%, var(--border)); display:flex; flex-direction:column; align-items:flex-start; justify-content:center; }
+  .create-card:hover { border-color: var(--series-1); }
+
+  .custom-badge {
+    display:inline-block; font-size: 11px; font-weight: 700; color: var(--series-2);
+    background: color-mix(in srgb, var(--series-2) 14%, transparent);
+    border-radius: 999px; padding: 2px 8px; margin-left: 6px; vertical-align: middle;
+  }
+  .delete-btn { padding: 9px 12px; }
+
+  .create-form { background: var(--surface-1); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+  .form-label { display:block; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin: 16px 0 6px; }
+  .form-label:first-child { margin-top: 0; }
+  .form-input, .form-textarea, .form-select {
+    width: 100%; font-family: inherit; font-size: 14.5px; padding: 10px 12px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--page); color: var(--text-primary);
+  }
+  .form-textarea { min-height: 70px; resize: vertical; line-height: 1.5; }
+  .form-input:focus, .form-textarea:focus, .form-select:focus { outline: 2px solid var(--series-1); }
+  .form-section-title { font-size: 15px; margin: 22px 0 12px; }
+  .create-note { font-size: 12.5px; color: var(--muted); margin: 16px 0 0; line-height: 1.5; }
+
+  .step-editor { background: var(--page); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
+  .step-editor-head { display:flex; align-items:center; gap:10px; margin-bottom: 10px; }
+  .step-editor-head strong { font-size: 13.5px; }
+  .form-select-inline { font-family: inherit; font-size: 13px; padding: 5px 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary); }
+  .step-remove-btn { margin-left: auto; padding: 5px 10px; font-size: 12.5px; }
+  .step-editor .form-input { margin-bottom: 8px; }
+  .mc-option-row { display:flex; align-items:center; gap:8px; margin-bottom: 6px; }
+  .mc-option-row input[type="radio"] { flex-shrink: 0; width: 16px; height: 16px; accent-color: var(--series-1); }
+  .step-editor-help { font-size: 12px; color: var(--muted); margin: 2px 0 8px; }
+  .num-editor-row { display:flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .num-editor-row .form-input { flex: 1; min-width: 120px; margin-bottom: 0; }
+
+  button {
+    font-family: inherit; cursor: pointer;
+    border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 600;
+  }
+  .btn-primary {
+    background: var(--series-1); color: white; padding: 10px 18px;
+  }
+  .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-secondary {
+    background: transparent; color: var(--text-secondary);
+    border: 1px solid var(--border); padding: 9px 16px;
+  }
+  .btn-back {
+    background: none; color: var(--text-secondary); font-weight: 500;
+    padding: 6px 0; margin-bottom: 14px; display:inline-flex; align-items:center; gap:6px;
+  }
+  .btn-back:hover { color: var(--text-primary); }
+
+  .concept-box {
+    background: color-mix(in srgb, var(--series-1) 6%, var(--surface-1));
+    border: 1px solid color-mix(in srgb, var(--series-1) 25%, var(--border));
+    border-radius: 14px; padding: 16px 20px; margin-bottom: 20px;
+  }
+  .concept-label { font-size: 12.5px; font-weight: 700; color: var(--series-1); text-transform: uppercase; letter-spacing: .02em; margin-bottom: 8px; }
+  .concept-box p { margin: 0 0 8px; font-size: 14px; line-height: 1.55; color: var(--text-primary); }
+  .concept-box p:last-child { margin-bottom: 0; }
+  .concept-box ul { margin: 6px 0 8px; padding-left: 20px; font-size: 14px; line-height: 1.6; color: var(--text-primary); }
+  .concept-box ul:last-child { margin-bottom: 0; }
+  .concept-box .eq { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--page); padding: 1px 5px; border-radius: 5px; }
+
+  .problem-list { display: flex; flex-direction: column; gap: 12px; }
+  .problem-row {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  .problem-row .info h4 { margin: 0 0 4px; font-size: 15.5px; }
+  .problem-row .info p { margin: 0; font-size: 13px; color: var(--text-secondary); max-width: 480px; }
+  .check-dot {
+    width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: white; background: var(--grid);
+  }
+  .check-dot.done { background: var(--good); }
+
+  .statement-box {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 14px;
+    padding: 18px 20px; margin-bottom: 20px;
+  }
+  .statement-box h2 { margin: 0 0 10px; font-size: 18px; }
+  .statement-box p { margin: 0; line-height: 1.55; color: var(--text-primary); font-size: 15px; }
+
+  .step-progress { display:flex; gap:6px; margin-bottom: 18px; }
+  .step-dot { flex:1; height:6px; border-radius: 999px; background: var(--grid); }
+  .step-dot.past { background: var(--good); }
+  .step-dot.current { background: var(--series-1); }
+
+  .step-card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 14px;
+    padding: 18px 20px; margin-bottom: 14px;
+  }
+  .step-card .step-label { font-size: 12.5px; font-weight: 700; color: var(--series-1); letter-spacing: .02em; text-transform: uppercase; margin-bottom: 6px; }
+  .step-card .step-prompt { font-size: 15.5px; margin: 0 0 14px; line-height: 1.5; }
+
+  .work-area { margin-bottom: 16px; }
+  .work-label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+  .work-textarea {
+    width: 100%; min-height: 90px; resize: vertical;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; line-height: 1.5;
+    padding: 10px 12px; border-radius: 10px; border: 1px dashed var(--border);
+    background: var(--page); color: var(--text-primary);
+  }
+  .work-textarea:focus { outline: 2px solid var(--series-1); border-style: solid; }
+  .work-textarea::placeholder { color: var(--muted); }
+
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .option-btn {
+    text-align: left; background: var(--page); border: 1px solid var(--border);
+    border-radius: 10px; padding: 11px 14px; font-weight: 500; font-size: 14.5px;
+    color: var(--text-primary);
+  }
+  .option-btn:hover { border-color: var(--series-1); }
+  .option-btn.correct { background: var(--good-bg); border-color: var(--good); color: var(--good); }
+  .option-btn.wrong { background: var(--critical-bg); border-color: var(--critical); color: var(--critical); }
+  .option-btn.disabled-choice { pointer-events: none; opacity: .55; }
+
+  .num-input-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .num-input-row input {
+    font-family: inherit; font-size: 15px; padding: 10px 12px; border-radius: 10px;
+    border: 1px solid var(--border); width: 140px; background: var(--page); color: var(--text-primary);
+  }
+  .num-input-row input:focus { outline: 2px solid var(--series-1); }
+  .unit-label { font-size: 13.5px; color: var(--text-secondary); }
+
+  .feedback { margin-top: 12px; padding: 10px 13px; border-radius: 10px; font-size: 14px; font-weight: 500; display:none; align-items:center; gap:8px; }
+  .feedback.show { display: flex; }
+  .feedback.ok { background: var(--good-bg); color: var(--good); }
+  .feedback.bad { background: var(--critical-bg); color: var(--critical); }
+
+  .hint-row { margin-top: 10px; }
+  .hint-link { background: none; color: var(--muted); font-size: 13px; font-weight: 500; padding: 0; text-decoration: underline; }
+  .hint-box { margin-top: 8px; background: var(--warning-bg); border: 1px solid color-mix(in srgb, var(--warning) 40%, transparent); border-radius: 10px; padding: 10px 13px; font-size: 13.5px; color: var(--text-primary); display:none; }
+  .hint-box.show { display: block; }
+
+  .explain-box { margin-top: 12px; background: var(--good-bg); border: 1px solid color-mix(in srgb, var(--good) 35%, transparent); border-radius: 10px; padding: 10px 13px; font-size: 13.5px; color: var(--text-primary); line-height: 1.5; }
+  .explain-box strong { color: var(--good); }
+
+  .past-step { background: var(--page); border: 1px solid var(--border); border-radius: 12px; padding: 12px 15px; margin-bottom: 10px; font-size: 13.5px; }
+  .past-step .ps-q { color: var(--text-secondary); margin-bottom: 4px; }
+  .past-step .ps-a { color: var(--good); font-weight: 600; }
+  .past-step .ps-explain { margin-top: 6px; color: var(--text-secondary); font-size: 12.5px; line-height: 1.5; }
+
+  .summary-box {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 14px;
+    padding: 20px; margin-top: 6px;
+  }
+  .summary-box .tag { display:inline-flex; align-items:center; gap:6px; color: var(--good); font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+  .summary-box p { line-height: 1.6; font-size: 14.5px; color: var(--text-primary); }
+  .summary-box .eq { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--page); padding: 2px 6px; border-radius: 6px; }
+
+  .graph-wrap { margin-top: 18px; }
+  .graph-wrap h4 { font-size: 14px; color: var(--text-secondary); margin: 0 0 8px; font-weight: 600; }
+  canvas.graph-canvas { width: 100%; height: 260px; display: block; border-radius: 12px; background: var(--surface-1); border: 1px solid var(--border); }
+  .graph-legend { display:flex; gap: 16px; margin-top: 8px; font-size: 12.5px; color: var(--text-secondary); flex-wrap: wrap; }
+  .graph-legend .item { display:flex; align-items:center; gap:6px; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 2px; }
+
+  .actions-row { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; gap: 10px; flex-wrap: wrap; }
+
+  footer.done-footer { text-align:center; margin-top: 24px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ---------- Datos: temas y problemas ---------- */
+
+const CATEGORIES = [
+  {
+    id: 'lineales',
+    icon: '➕',
+    name: 'Ecuaciones lineales',
+    desc: 'Plantea y resuelve ecuaciones de primer grado a partir de problemas cotidianos.',
+    concept: '<p><strong>Ecuación de primer grado:</strong> una igualdad donde la incógnita x aparece sin exponentes. Se resuelve despejando x mediante operaciones inversas (sumar/restar, multiplicar/dividir) hasta dejarla sola en un lado.</p>',
+    problems: [
+      {
+        id: 'lin-taxi',
+        title: 'El viaje en taxi',
+        statement: 'Un taxi cobra $1.50 de arranque más $0.75 por cada kilómetro recorrido. Si un viaje costó en total $9.75, ¿cuántos kilómetros se recorrieron?',
+        steps: [
+          {
+            type: 'mc',
+            prompt: '¿Qué representa la variable x en este problema?',
+            options: ['x = el costo del arranque', 'x = los kilómetros recorridos', 'x = el número de pasajeros'],
+            correct: 1,
+            hint: 'Busca la cantidad desconocida que la pregunta te pide encontrar: "¿cuántos kilómetros...?".'
+          },
+          {
+            type: 'mc',
+            prompt: 'Plantea la ecuación que modela el problema.',
+            options: ['1.50 + 0.75x = 9.75', '1.50x + 0.75 = 9.75', '0.75 + 1.50x = 9.75'],
+            correct: 0,
+            hint: 'El costo fijo (arranque) se suma una sola vez; el costo por km se multiplica por los km recorridos (x).'
+          },
+          {
+            type: 'num',
+            prompt: 'Resuelve la ecuación 1.50 + 0.75x = 9.75 y encuentra el valor de x.',
+            correct: 11,
+            tolerance: 0.05,
+            unit: 'km',
+            hint: 'Resta 1.50 en ambos lados: 0.75x = 8.25. Luego divide entre 0.75.'
+          }
+        ],
+        summary: 'Despejando obtenemos <span class="eq">0.75x = 9.75 − 1.50 = 8.25</span>, y dividiendo entre 0.75: <span class="eq">x = 11</span>. El viaje recorrió <strong>11 km</strong>.',
+        graph: null
+      },
+      {
+        id: 'lin-dinero',
+        title: 'Ana y Luis',
+        statement: 'Ana tiene el doble de dinero que Luis. Entre los dos tienen $96. ¿Cuánto dinero tiene cada uno?',
+        steps: [
+          {
+            type: 'mc',
+            prompt: 'Si x = dinero de Luis, ¿cómo se expresa el dinero de Ana?',
+            options: ['Ana tiene x + 2', 'Ana tiene 2x', 'Ana tiene x/2'],
+            correct: 1,
+            hint: '"El doble" significa multiplicar por 2.'
+          },
+          {
+            type: 'mc',
+            prompt: 'Plantea la ecuación que representa el total de $96.',
+            options: ['x + 2x = 96', '2x − x = 96', 'x · 2x = 96'],
+            correct: 0,
+            hint: 'La suma del dinero de Luis (x) y el de Ana (2x) debe dar el total.'
+          },
+          {
+            type: 'num',
+            prompt: 'Resuelve x + 2x = 96. ¿Cuánto dinero tiene Luis?',
+            correct: 32,
+            tolerance: 0.1,
+            unit: '$',
+            hint: '3x = 96, así que x = 96/3.'
+          },
+          {
+            type: 'num',
+            prompt: '¿Cuánto dinero tiene Ana?',
+            correct: 64,
+            tolerance: 0.1,
+            unit: '$',
+            hint: 'Ana tiene el doble de lo que tiene Luis (2 × 32).'
+          }
+        ],
+        summary: 'De <span class="eq">3x = 96</span> obtenemos <span class="eq">x = 32</span>. Luis tiene <strong>$32</strong> y Ana, el doble, tiene <strong>$64</strong>.',
+        graph: null
+      }
+    ]
+  },
+  {
+    id: 'sistemas',
+    icon: '⚖️',
+    name: 'Sistemas de ecuaciones',
+    desc: 'Traduce situaciones con dos incógnitas en un sistema y resuélvelo.',
+    concept: '<p><strong>Sistema de ecuaciones:</strong> dos ecuaciones con dos incógnitas que deben cumplirse al mismo tiempo. Se resuelve por <strong>sustitución</strong> (despejar una variable y sustituirla en la otra ecuación) o por <strong>eliminación</strong> (sumar o restar ecuaciones para cancelar una variable).</p>',
+    problems: [
+      {
+        id: 'sis-vehiculos',
+        title: 'Carros y motos en el estacionamiento',
+        statement: 'En un estacionamiento hay carros y motos: 27 vehículos en total y 74 llantas en total (cada carro tiene 4 llantas y cada moto tiene 2). ¿Cuántos carros y cuántas motos hay?',
+        steps: [
+          {
+            type: 'mc',
+            prompt: 'Sea x = número de carros, y = número de motos. ¿Cuál sistema representa el problema?',
+            options: [
+              'x + y = 27  ;  4x + 2y = 74',
+              'x + y = 74  ;  4x + 2y = 27',
+              'x − y = 27  ;  2x + 4y = 74'
+            ],
+            correct: 0,
+            hint: 'Una ecuación cuenta vehículos (x+y=27); la otra cuenta llantas (4 por carro, 2 por moto).'
+          },
+          {
+            type: 'num',
+            prompt: 'Despeja y = 27 − x y sustituye en 4x + 2y = 74. Resuelve para x (número de carros).',
+            correct: 10,
+            tolerance: 0.1,
+            unit: 'carros',
+            hint: '4x + 2(27−x) = 74  →  4x + 54 − 2x = 74  →  2x = 20.'
+          },
+          {
+            type: 'num',
+            prompt: '¿Cuántas motos hay (y)?',
+            correct: 17,
+            tolerance: 0.1,
+            unit: 'motos',
+            hint: 'y = 27 − x = 27 − 10.'
+          }
+        ],
+        summary: 'Sustituyendo <span class="eq">y = 27−x</span> en la segunda ecuación: <span class="eq">4x + 2(27−x) = 74 → 2x = 20 → x = 10</span>. Entonces hay <strong>10 carros</strong> y <strong>17 motos</strong> (verificación: 10+17=27 y 4·10+2·17=74 ✓).',
+        graph: null
+      },
+      {
+        id: 'sis-frutas',
+        title: 'El precio de las frutas',
+        statement: '3 manzanas y 2 peras cuestan $2.20. 1 manzana y 4 peras cuestan $2.40. ¿Cuánto cuesta cada fruta?',
+        steps: [
+          {
+            type: 'mc',
+            prompt: 'Sea a = precio de una manzana, p = precio de una pera. ¿Cuál es el sistema correcto?',
+            options: [
+              '3a + 2p = 2.20  ;  a + 4p = 2.40',
+              '2a + 3p = 2.20  ;  4a + p = 2.40',
+              '3a − 2p = 2.20  ;  a − 4p = 2.40'
+            ],
+            correct: 0,
+            hint: 'Traduce directamente "3 manzanas y 2 peras" y "1 manzana y 4 peras".'
+          },
+          {
+            type: 'num',
+            prompt: 'Multiplica la primera ecuación por 2 para igualar el coeficiente de p con la segunda ecuación, y luego réstale la segunda ecuación para eliminar p. Resuelve para a (precio de la manzana).',
+            correct: 0.4,
+            tolerance: 0.01,
+            unit: '$',
+            hint: 'Primera ecuación × 2: 6a + 4p = 4.40. Réstale la segunda (a + 4p = 2.40): queda 5a = 2.00, así que a = 2.00/5.'
+          },
+          {
+            type: 'num',
+            prompt: '¿Cuánto cuesta una pera (p)?',
+            correct: 0.5,
+            tolerance: 0.01,
+            unit: '$',
+            hint: 'Usa a + 4p = 2.40 con a = 0.40.'
+          }
+        ],
+        summary: 'Multiplicando la primera ecuación por 2: <span class="eq">6a+4p=4.40</span>, y restando la segunda <span class="eq">(a+4p=2.40)</span> se elimina p: <span class="eq">5a = 2.00 → a = 0.40</span>. Sustituyendo: <span class="eq">0.40 + 4p = 2.40 → p = 0.50</span>. La manzana cuesta <strong>$0.40</strong> y la pera <strong>$0.50</strong>.',
+        graph: null
+      }
+    ]
+  },
+  {
+    id: 'flineales',
+    icon: '📈',
+    name: 'Funciones lineales',
+    desc: 'Modela situaciones con una función lineal y analiza su gráfica.',
+    concept: '<p><strong>Función lineal:</strong> f(x) = mx + b, donde <strong>m</strong> es la pendiente (tasa de cambio) y <strong>b</strong> es la ordenada al origen (el valor de f(0)). Su gráfica es una línea recta.</p>',
+    problems: [
+      {
+        id: 'fl-streaming',
+        title: 'Suscripción de streaming',
+        statement: 'Un servicio cobra una tarifa fija de $5 más $2 por cada película que rentas. Modela el costo total C en función del número de películas n, y usa el modelo para responder.',
+        steps: [
+          {
+            type: 'mc',
+            prompt: '¿Cuál función C(n) representa el costo total?',
+            options: ['C(n) = 5n + 2', 'C(n) = 5 + 2n', 'C(n) = 5 · 2 · n'],
+            correct: 1,
+            hint: 'La tarifa fija ($5) no depende de n; el costo variable es $2 por cada película (2n).'
+          },
+          {
+            type: 'num',
+            prompt: 'Usando C(n) = 5 + 2n, ¿cuánto pagarías por rentar 6 películas?',
+            correct: 17,
+            tolerance: 0.1,
+            unit: '$',
+            hint: 'Sustituye n = 6: C(6) = 5 + 2(6).'
+          },
+          {
+            type: 'mc',
+            prompt: '¿Qué representa la pendiente (2) de esta función en el contexto del problema?',
+            options: ['El costo fijo del servicio', 'El costo adicional por cada película rentada', 'El número total de películas'],
+            correct: 1,
+            hint: 'La pendiente es la tasa de cambio: cuánto aumenta C por cada unidad que aumenta n.'
+          }
+        ],
+        summary: 'La función es <span class="eq">C(n) = 5 + 2n</span>. Para 6 películas: <span class="eq">C(6) = 5 + 12 = 17</span>, es decir <strong>$17</strong>. La pendiente (2) indica que el costo sube $2 por cada película adicional; el intercepto (5) es la tarifa fija cuando n = 0.',
+        graph: { kind: 'linear', fn: n => 5 + 2*n, xMin: 0, xMax: 10, xLabel: 'n (películas)', yLabel: 'C (costo en $)', points: [{x:6, y:17, label:'n=6 → $17'}] }
+      },
+      {
+        id: 'fl-tanque',
+        title: 'El tanque que se vacía',
+        statement: 'Un tanque tiene 500 litros de agua y se vacía a razón de 25 litros por minuto. Escribe la función V(t) que da el volumen restante después de t minutos.',
+        steps: [
+          {
+            type: 'mc',
+            prompt: '¿Cuál función V(t) modela el volumen restante?',
+            options: ['V(t) = 500 + 25t', 'V(t) = 500 − 25t', 'V(t) = 25t − 500'],
+            correct: 1,
+            hint: 'El volumen empieza en 500 y disminuye (resta) 25 litros por cada minuto.'
+          },
+          {
+            type: 'num',
+            prompt: 'Resuelve V(t) = 0 para encontrar en qué minuto se vacía por completo el tanque.',
+            correct: 20,
+            tolerance: 0.1,
+            unit: 'min',
+            hint: '500 − 25t = 0  →  25t = 500  →  t = 500/25.'
+          },
+          {
+            type: 'num',
+            prompt: '¿Cuántos litros quedan después de 12 minutos?',
+            correct: 200,
+            tolerance: 1,
+            unit: 'litros',
+            hint: 'Sustituye t=12 en V(t) = 500 − 25t.'
+          }
+        ],
+        summary: 'La función es <span class="eq">V(t) = 500 − 25t</span>. Se vacía cuando <span class="eq">t = 20</span> minutos. A los 12 minutos quedan <span class="eq">500 − 300 = 200</span> litros.',
+        graph: { kind: 'linear', fn: t => Math.max(0, 500 - 25*t), xMin: 0, xMax: 22, xLabel: 't (minutos)', yLabel: 'V (litros)', points: [{x:20, y:0, label:'t=20 → vacío'}, {x:12, y:200, label:'t=12 → 200 L'}] }
+      }
+    ]
+  },
+  {
+    id: 'fcuadraticas',
+    icon: '🎯',
+    name: 'Funciones cuadráticas',
+    desc: 'Analiza raíces, vértice y máximos/mínimos a partir de situaciones reales.',
+    concept: '<p><strong>Función cuadrática:</strong> f(x) = ax² + bx + c (a≠0), su gráfica es una parábola. Si a&gt;0 abre hacia arriba (mínimo); si a&lt;0 abre hacia abajo (máximo). El vértice está en x = −b/(2a). El discriminante Δ = b²−4ac indica cuántas raíces reales tiene: Δ&gt;0 → 2 raíces, Δ=0 → 1 raíz, Δ&lt;0 → 0 raíces.</p>',
+    problems: [
+      {
+        id: 'fc-pelota',
+        title: 'La pelota lanzada al aire',
+        statement: 'Se lanza una pelota hacia arriba. Su altura en metros después de t segundos está dada por h(t) = −5t² + 20t.',
+        steps: [
+          {
+            type: 'mc',
+            prompt: 'Identifica los coeficientes a, b, c de h(t) = −5t² + 20t + 0.',
+            options: ['a=−5, b=20, c=0', 'a=20, b=−5, c=0', 'a=−5, b=0, c=20'],
+            correct: 0,
+            hint: 'a acompaña a t², b acompaña a t, c es el término independiente.'
+          },
+          {
+            type: 'num',
+            prompt: 'Factoriza h(t) = t(−5t + 20) = 0. Además de t = 0, ¿en qué segundo (t > 0) la pelota toca el suelo?',
+            correct: 4,
+            tolerance: 0.05,
+            unit: 's',
+            hint: '−5t + 20 = 0  →  t = 20/5.'
+          },
+          {
+            type: 'num',
+            prompt: 'El vértice ocurre en t = −b/(2a). Calcula ese instante t.',
+            correct: 2,
+            tolerance: 0.05,
+            unit: 's',
+            hint: 't = −20 / (2·(−5)) = −20/−10.'
+          },
+          {
+            type: 'num',
+            prompt: '¿Cuál es la altura máxima h(2)?',
+            correct: 20,
+            tolerance: 0.2,
+            unit: 'm',
+            hint: 'h(2) = −5(2)² + 20(2) = −20 + 40.'
+          }
+        ],
+        summary: 'Con <span class="eq">a=−5, b=20, c=0</span>: las raíces son <span class="eq">t=0</span> y <span class="eq">t=4</span> (cae al suelo a los 4 s). El vértice está en <span class="eq">t=2</span>, con altura máxima <span class="eq">h(2) = 20 m</span>.',
+        graph: { kind: 'quadratic', fn: t => -5*t*t + 20*t, xMin: -0.3, xMax: 4.3, xLabel: 't (segundos)', yLabel: 'h (metros)', points: [{x:4, y:0, label:'t=4 → suelo'}, {x:2, y:20, label:'vértice (2, 20)'}] }
+      },
+      {
+        id: 'fc-jardin',
+        title: 'El jardín rectangular',
+        statement: 'Un granjero quiere cercar un jardín rectangular donde el largo es 4 metros más que el ancho. Si el área debe ser 45 m², encuentra las dimensiones del jardín.',
+        steps: [
+          {
+            type: 'mc',
+            prompt: 'Si x = ancho, ¿cómo se expresa el largo?',
+            options: ['largo = x − 4', 'largo = x + 4', 'largo = 4x'],
+            correct: 1,
+            hint: '"4 metros más que el ancho" significa sumar 4 al ancho.'
+          },
+          {
+            type: 'mc',
+            prompt: '¿Cuál ecuación cuadrática representa el área de 45 m²?',
+            options: ['x(x+4) = 45', 'x + (x+4) = 45', 'x² − 4 = 45'],
+            correct: 0,
+            hint: 'Área = ancho × largo = x · (x+4).'
+          },
+          {
+            type: 'num',
+            prompt: 'Expandiendo obtienes x² + 4x − 45 = 0, que factoriza como (x+9)(x−5) = 0. ¿Cuál es el valor positivo de x (el ancho)?',
+            correct: 5,
+            tolerance: 0.05,
+            unit: 'm',
+            hint: 'De las dos raíces (−9 y 5), solo una tiene sentido como medida de longitud.'
+          },
+          {
+            type: 'num',
+            prompt: '¿Cuánto mide el largo del jardín?',
+            correct: 9,
+            tolerance: 0.05,
+            unit: 'm',
+            hint: 'largo = x + 4, con x = 5.'
+          }
+        ],
+        summary: 'La ecuación <span class="eq">x² + 4x − 45 = 0</span> factoriza como <span class="eq">(x+9)(x−5)=0</span>. Como x debe ser positivo, <span class="eq">x = 5</span> (ancho) y el largo es <span class="eq">5+4 = 9</span>. El jardín mide <strong>5 m × 9 m</strong> (5×9=45 ✓).',
+        graph: { kind: 'quadratic', fn: x => x*x + 4*x - 45, xMin: -11, xMax: 7, xLabel: 'x (ancho en m)', yLabel: 'x² + 4x − 45', points: [{x:5, y:0, label:'raíz válida x=5'}, {x:-9, y:0, label:'raíz descartada x=−9'}] }
+      }
+    ]
+  },
+  {
+    id: 'fundamentos',
+    icon: '🔍',
+    name: 'Fundamentos de funciones',
+    desc: 'Qué es una función, su dominio, rango y la notación funcional.',
+    concept: '<p><strong>Función:</strong> relación entre dos conjuntos donde cada elemento del dominio tiene exactamente una imagen (una sola salida por cada entrada).</p><ul><li><strong>Dominio:</strong> todos los valores posibles de la variable independiente (x).</li><li><strong>Rango:</strong> todos los valores posibles de la variable dependiente (y).</li><li><strong>Prueba de la línea vertical:</strong> si una recta vertical corta la gráfica en más de un punto, no es función.</li></ul>',
+    problems: [
+      {
+        id: 'fund-esfuncion',
+        title: '¿Es una función?',
+        statement: 'Analiza dos relaciones: la relación A tiene los pares (1,4), (2,7) y (3,9). La relación B tiene los pares (2,3) y (2,5). Usa la definición de función y la prueba de la línea vertical para decidir cuál es función.',
+        steps: [
+          {
+            type: 'mc',
+            prompt: 'Una función es una relación donde...',
+            options: ['Cada valor de x tiene exactamente un valor de y', 'Cada valor de y tiene exactamente un valor de x', 'Los valores de x pueden repetirse con distintos y'],
+            correct: 0,
+            hint: 'Piensa en la "regla" que asigna una única salida a cada entrada.'
+          },
+          {
+            type: 'mc',
+            prompt: 'La relación A: (1,4), (2,7), (3,9). ¿Es una función?',
+            options: ['Sí, cada x aparece una sola vez con un único y', 'No, porque los valores de y son distintos', 'No se puede saber sin una gráfica'],
+            correct: 0,
+            hint: 'Revisa si algún valor de x se repite con un y diferente.'
+          },
+          {
+            type: 'mc',
+            prompt: 'La relación B: (2,3) y (2,5). ¿Es una función?',
+            options: ['Sí, porque 3 y 5 son valores válidos', 'No, porque x=2 tiene dos valores distintos de y (3 y 5)', 'Sí, porque son solo dos pares'],
+            correct: 1,
+            hint: 'Fíjate en el valor de x: ¿se repite con salidas distintas?'
+          },
+          {
+            type: 'mc',
+            prompt: '¿Qué prueba gráfica confirma si una curva representa una función?',
+            options: ['La prueba de la línea horizontal', 'La prueba de la línea vertical', 'La prueba del origen'],
+            correct: 1,
+            hint: 'Se traza una línea perpendicular al eje X (vertical) y se cuenta cuántas veces corta la gráfica.'
+          }
+        ],
+        summary: 'La relación A es función porque cada x (1, 2, 3) tiene un único y asociado. La relación B <strong>no</strong> es función porque x=2 tiene dos imágenes distintas (3 y 5), lo cual viola la definición. Gráficamente, esto se detecta con la <strong>prueba de la línea vertical</strong>.',
+        graph: null
+      },
+      {
+        id: 'fund-notacion',
+        title: 'Notación funcional: evaluar y despejar',
+        statement: 'Dada f(x) = 2x + 3, resuelve lo siguiente sobre notación funcional, dominio y rango.',
+        steps: [
+          {
+            type: 'num',
+            prompt: 'Calcula f(3).',
+            correct: 9,
+            tolerance: 0.01,
+            hint: 'Sustituye x por 3: f(3) = 2(3) + 3.'
+          },
+          {
+            type: 'mc',
+            prompt: '¿Qué representa el resultado f(3) = 9 en el contexto de la función?',
+            options: ['El valor de x cuando y = 3', 'El valor de salida y cuando la entrada es x = 3', 'La pendiente de la función'],
+            correct: 1,
+            hint: 'f(3) siempre significa "el valor de y correspondiente a x=3".'
+          },
+          {
+            type: 'num',
+            prompt: 'Encuentra el valor de x tal que f(x) = 15.',
+            correct: 6,
+            tolerance: 0.01,
+            hint: '2x + 3 = 15  →  2x = 12.'
+          },
+          {
+            type: 'mc',
+            prompt: '¿Cuál es el dominio de f(x) = 2x + 3?',
+            options: ['Todos los números reales', 'Solo los enteros positivos', 'Todos los reales excepto x = 0'],
+            correct: 0,
+            hint: 'No hay ninguna operación (como dividir o sacar raíz) que restrinja los valores de x.'
+          }
+        ],
+        summary: 'f(3) = 2(3)+3 = <strong>9</strong>. Para f(x)=15: <span class="eq">2x+3=15 → x=6</span>. Como f(x)=2x+3 no tiene restricciones (no hay división ni raíz), su dominio es <strong>todos los números reales</strong>.',
+        graph: null
+      }
+    ]
+  },
+  {
+    id: 'tipos-paridad',
+    icon: '🧩',
+    name: 'Tipos de funciones y paridad',
+    desc: 'Funciones constantes, inyectivas, sobreyectivas, biyectivas, pares e impares.',
+    concept: '<p><strong>Constante:</strong> f(x)=k para todo x. <strong>Inyectiva:</strong> cada salida proviene de una única entrada. <strong>Sobreyectiva:</strong> cubre todo el codominio. <strong>Biyectiva:</strong> inyectiva y sobreyectiva a la vez.</p><ul><li><strong>Función par:</strong> f(−x) = f(x), simetría respecto al eje Y (ej. f(x)=x²).</li><li><strong>Función impar:</strong> f(−x) = −f(x), simetría respecto al origen (ej. f(x)=x³).</li></ul>',
+    problems: [
+      {
+        id: 'tipos-clasifica',
+        title: 'Clasifica la función',
+        statement: 'Analiza f(x) = 5 (función constante) y g(x) = x (función identidad) para practicar los conceptos de función constante, inyectiva y sobreyectiva.',
+        steps: [
+          {
+            type: 'mc',
+            prompt: 'f(x) = 5 para todo valor de x. ¿Qué tipo de función es?',
+            options: ['Función constante', 'Función inyectiva', 'Función cuadrática'],
+            correct: 0,
+            hint: 'El valor de salida nunca cambia, sin importar la entrada.'
+          },
+          {
+            type: 'mc',
+            prompt: '¿Puede una función constante como f(x)=5 ser inyectiva (si el dominio tiene más de un valor)?',
+            options: ['Sí, siempre es inyectiva', 'No, porque distintos valores de x dan el mismo y', 'Depende del rango'],
+            correct: 1,
+            hint: 'Inyectiva requiere que entradas distintas den salidas distintas.'
+          },
+          {
+            type: 'mc',
+            prompt: 'g(x) = x asigna a cada x un valor único de y, y además cubre todos los números reales como salida. ¿Qué tipo de función es?',
+            options: ['Solo inyectiva', 'Solo sobreyectiva', 'Biyectiva (inyectiva y sobreyectiva)'],
+            correct: 2,
+            hint: 'Cumple ambas condiciones a la vez: cada salida es única Y se alcanza todo el codominio.'
+          }
+        ],
+        summary: 'f(x)=5 es <strong>constante</strong> y no es inyectiva (todas las entradas comparten la misma salida). g(x)=x sí es inyectiva (cada x da un y distinto) y sobreyectiva (cubre todos los reales), por lo tanto es <strong>biyectiva</strong>.',
+        graph: null
+      },
+      {
+        id: 'tipos-parimpar',
+        title: 'Funciones pares e impares',
+        statement: 'Determina si f(x) = x² y g(x) = x³ son funciones pares, impares o ninguna, usando las condiciones f(−x)=f(x) (par) y f(−x)=−f(x) (impar).',
+        steps: [
+          {
+            type: 'num',
+            prompt: 'Para f(x) = x², calcula f(−2).',
+            correct: 4,
+            tolerance: 0.01,
+            hint: '(−2)² = 4.'
+          },
+          {
+            type: 'mc',
+            prompt: 'Como f(−2) = 4 = f(2), y esto se cumple para cualquier x, ¿qué tipo de función es f(x) = x²?',
+            options: ['Par', 'Impar', 'Ninguna'],
+            correct: 0,
+            hint: 'f(−x) = f(x) es la condición de función par.'
+          },
+          {
+            type: 'num',
+            prompt: 'Para g(x) = x³, calcula g(−2).',
+            correct: -8,
+            tolerance: 0.01,
+            hint: '(−2)³ = −8.'
+          },
+          {
+            type: 'mc',
+            prompt: 'Como g(−2) = −8 = −g(2), ¿qué tipo de función es g(x) = x³?',
+            options: ['Par', 'Impar', 'Ninguna'],
+            correct: 1,
+            hint: 'f(−x) = −f(x) es la condición de función impar.'
+          }
+        ],
+        summary: 'f(x)=x² es <strong>par</strong> (simetría respecto al eje Y): f(−2)=f(2)=4. g(x)=x³ es <strong>impar</strong> (simetría respecto al origen): g(−2)=−g(2)=−8.',
+        graph: { kind: 'quadratic', fn: x => x*x, xMin: -3, xMax: 3, xLabel: 'x', yLabel: 'f(x) = x²', points: [{x:-2, y:4, label:'f(−2)=4'}, {x:2, y:4, label:'f(2)=4'}] }
+      }
+    ]
+  },
+  {
+    id: 'rectas',
+    icon: '📏',
+    name: 'Rectas: formas y tipos',
+    desc: 'Identifica pendientes, tipos de rectas y usa la forma punto-pendiente.',
+    concept: '<p><strong>Forma general:</strong> f(x) = mx + b, donde m es la pendiente y b la ordenada al origen.</p><ul><li>Horizontal: y = k (m = 0) · Vertical: x = k (pendiente indefinida)</li><li>Creciente: m &gt; 0 · Decreciente: m &lt; 0</li><li><strong>Forma punto-pendiente:</strong> y − y₁ = m(x − x₁), útil cuando conoces un punto y la pendiente.</li></ul>',
+    problems: [
+      {
+        id: 'rectas-tipos',
+        title: 'Tipos de rectas',
+        statement: 'Clasifica las rectas y = 4, x = −2, y = 3x + 1, y = −x + 5 según su pendiente.',
+        steps: [
+          { type: 'mc', prompt: '¿Qué tipo de recta es y = 4?', options: ['Horizontal (m = 0)', 'Vertical (pendiente indefinida)', 'Creciente'], correct: 0, hint: 'y siempre vale 4, sin importar x: no cambia de altura.' },
+          { type: 'mc', prompt: '¿Qué tipo de recta es x = −2?', options: ['Horizontal', 'Vertical (pendiente indefinida)', 'Decreciente'], correct: 1, hint: 'x siempre vale −2: es una línea que sube y baja en el mismo valor de x.' },
+          { type: 'mc', prompt: 'y = 3x + 1 tiene m = 3 > 0. ¿Cómo se clasifica?', options: ['Creciente', 'Decreciente', 'Constante'], correct: 0, hint: 'Pendiente positiva → sube de izquierda a derecha.' },
+          { type: 'mc', prompt: 'y = −x + 5 tiene m = −1 < 0. ¿Cómo se clasifica?', options: ['Creciente', 'Decreciente', 'Horizontal'], correct: 1, hint: 'Pendiente negativa → baja de izquierda a derecha.' }
+        ],
+        summary: 'y=4 es <strong>horizontal</strong> (m=0). x=−2 es <strong>vertical</strong> (pendiente indefinida). y=3x+1 es <strong>creciente</strong> (m=3&gt;0). y=−x+5 es <strong>decreciente</strong> (m=−1&lt;0).',
+        graph: { kind: 'linear', fn: x => 3*x + 1, xMin: -3, xMax: 3, xLabel: 'x', yLabel: 'y = 3x + 1', points: [{x:0, y:1, label:'b=1'}] }
+      },
+      {
+        id: 'rectas-puntopendiente',
+        title: 'Forma punto-pendiente',
+        statement: 'Una recta pasa por el punto (2, 5) y tiene pendiente m = 3. Encuentra su ecuación usando la forma punto-pendiente y − y₁ = m(x − x₁), y conviértela a la forma y = mx + b.',
+        steps: [
+          { type: 'mc', prompt: '¿Cuál es la ecuación en forma punto-pendiente?', options: ['y − 5 = 3(x − 2)', 'y − 2 = 3(x − 5)', 'y − 5 = 2(x − 3)'], correct: 0, hint: 'Sustituye (x₁,y₁)=(2,5) y m=3 en y − y₁ = m(x − x₁).' },
+          { type: 'num', prompt: 'Distribuye: y − 5 = 3x − 6. Al despejar y = 3x + b, ¿cuál es el valor de b?', correct: -1, tolerance: 0.01, hint: 'y = 3x − 6 + 5.' },
+          { type: 'num', prompt: 'Usa y = 3x − 1 para encontrar y cuando x = 4.', correct: 11, tolerance: 0.01, hint: '3(4) − 1.' }
+        ],
+        summary: 'La ecuación punto-pendiente <span class="eq">y−5=3(x−2)</span> se convierte en <span class="eq">y=3x−1</span> (b=−1). En x=4: <span class="eq">y=3(4)−1=11</span>.',
+        graph: { kind: 'linear', fn: x => 3*x - 1, xMin: -1, xMax: 5, xLabel: 'x', yLabel: 'y = 3x − 1', points: [{x:2, y:5, label:'punto dado (2,5)'}, {x:4, y:11, label:'(4,11)'}] }
+      }
+    ]
+  },
+  {
+    id: 'parabolas',
+    icon: '🎢',
+    name: 'Parábolas: vértice y discriminante',
+    desc: 'Calcula el discriminante, las raíces con la fórmula cuadrática y el vértice.',
+    concept: '<p><strong>Forma general:</strong> f(x) = ax² + bx + c. El <strong>vértice</strong> está en x = −b/(2a). El <strong>discriminante</strong> Δ = b² − 4ac indica el número de raíces reales: Δ&gt;0 → 2 raíces, Δ=0 → 1 raíz (doble), Δ&lt;0 → 0 raíces. <strong>Fórmula cuadrática:</strong> x = (−b ± √Δ) / 2a.</p>',
+    problems: [
+      {
+        id: 'parab-analiza',
+        title: 'Analiza la parábola',
+        statement: 'Dada f(x) = −2x² + 3x + 1, identifica sus coeficientes, su intersección con el eje Y, su discriminante y cuántas raíces reales tiene.',
+        steps: [
+          { type: 'mc', prompt: 'Identifica el coeficiente a en f(x) = −2x² + 3x + 1.', options: ['a = −2', 'a = 3', 'a = 1'], correct: 0, hint: 'a es el coeficiente que acompaña a x².' },
+          { type: 'mc', prompt: 'Como a = −2 < 0, ¿hacia dónde abre la parábola?', options: ['Hacia arriba (forma de U)', 'Hacia abajo (U invertida)', 'No se puede saber sin graficar'], correct: 1, hint: 'a negativo siempre abre hacia abajo (tiene un máximo).' },
+          { type: 'num', prompt: '¿Cuál es la intersección con el eje Y (el valor de c)?', correct: 1, tolerance: 0.01, hint: 'c es el término independiente, y también es f(0).' },
+          { type: 'num', prompt: 'Calcula el discriminante Δ = b² − 4ac con a=−2, b=3, c=1.', correct: 17, tolerance: 0.1, hint: 'Δ = 3² − 4(−2)(1) = 9 + 8.' },
+          { type: 'mc', prompt: 'Como Δ = 17 > 0, ¿cuántas raíces reales tiene la función?', options: ['0 raíces reales', '1 raíz real (doble)', '2 raíces reales distintas'], correct: 2, hint: 'Δ positivo siempre da dos raíces reales distintas.' }
+        ],
+        summary: 'Con a=−2, b=3, c=1: la parábola abre hacia abajo, corta el eje Y en (0,1), y su discriminante Δ=9+8=<strong>17</strong> (positivo), por lo que tiene <strong>2 raíces reales distintas</strong>.',
+        graph: { kind: 'quadratic', fn: x => -2*x*x + 3*x + 1, xMin: -1.5, xMax: 2.5, xLabel: 'x', yLabel: 'f(x) = −2x²+3x+1', points: [{x:0, y:1, label:'(0,1) intersección Y'}, {x:0.75, y:2.125, label:'vértice (0.75, 2.125)'}] }
+      },
+      {
+        id: 'parab-formula',
+        title: 'Fórmula cuadrática paso a paso',
+        statement: 'Encuentra las raíces de x² − 5x + 6 = 0 usando la fórmula cuadrática, y determina el vértice de la parábola.',
+        steps: [
+          { type: 'num', prompt: 'Con a=1, b=−5, c=6, calcula el discriminante Δ = b² − 4ac.', correct: 1, tolerance: 0.01, hint: 'Δ = (−5)² − 4(1)(6) = 25 − 24.' },
+          { type: 'num', prompt: 'Aplica x = (−b ± √Δ)/(2a). Calcula la raíz mayor (usando +√Δ).', correct: 3, tolerance: 0.05, hint: 'x = (5 + 1)/2.' },
+          { type: 'num', prompt: 'Calcula la raíz menor (usando −√Δ).', correct: 2, tolerance: 0.05, hint: 'x = (5 − 1)/2.' },
+          { type: 'num', prompt: 'El vértice está en x = −b/(2a). Calcula ese valor de x.', correct: 2.5, tolerance: 0.05, hint: 'x = 5/2.' },
+          { type: 'num', prompt: 'Calcula f(2.5) para hallar la coordenada y del vértice.', correct: -0.25, tolerance: 0.05, hint: 'f(2.5) = (2.5)² − 5(2.5) + 6.' }
+        ],
+        summary: 'Δ = 25−24 = <strong>1</strong>. Las raíces son <span class="eq">x=(5±1)/2</span> → x=3 y x=2. El vértice (también el eje de simetría) está en <span class="eq">x=2.5</span>, con f(2.5) = <strong>−0.25</strong>.',
+        graph: { kind: 'quadratic', fn: x => x*x - 5*x + 6, xMin: 0, xMax: 5, xLabel: 'x', yLabel: 'f(x) = x²−5x+6', points: [{x:2, y:0, label:'raíz x=2'}, {x:3, y:0, label:'raíz x=3'}, {x:2.5, y:-0.25, label:'vértice (2.5,−0.25)'}] }
+      }
+    ]
+  },
+  {
+    id: 'dominio-intersecciones',
+    icon: '🚫',
+    name: 'Dominio restringido e intersecciones',
+    desc: 'Encuentra intersecciones con los ejes y determina restricciones del dominio.',
+    concept: '<p><strong>Intersección con el eje Y:</strong> evaluar f(0). <strong>Intersección con el eje X:</strong> resolver f(x)=0.</p><ul><li>En funciones racionales (con x en el denominador), el dominio excluye los valores que hacen cero al denominador, porque la división entre cero no está definida.</li></ul>',
+    problems: [
+      {
+        id: 'dom-intersecciones',
+        title: 'Intersecciones con los ejes',
+        statement: 'Dada f(x) = 3x − 6, encuentra dónde la función corta al eje Y y al eje X.',
+        steps: [
+          { type: 'num', prompt: 'Evalúa f(0) para hallar la intersección con el eje Y.', correct: -6, tolerance: 0.01, hint: 'f(0) = 3(0) − 6.' },
+          { type: 'mc', prompt: '¿Cuál es el punto de intersección con el eje Y?', options: ['(0, −6)', '(−6, 0)', '(0, 3)'], correct: 0, hint: 'La intersección con el eje Y siempre tiene la forma (0, f(0)).' },
+          { type: 'num', prompt: 'Resuelve f(x) = 0 (3x − 6 = 0) para hallar la intersección con el eje X.', correct: 2, tolerance: 0.01, hint: '3x = 6.' },
+          { type: 'mc', prompt: '¿Cuál es el punto de intersección con el eje X?', options: ['(2, 0)', '(0, 2)', '(−2, 0)'], correct: 0, hint: 'La intersección con el eje X siempre tiene la forma (x, 0).' }
+        ],
+        summary: 'f(0) = −6, así que corta el eje Y en <strong>(0, −6)</strong>. Resolviendo 3x−6=0 obtenemos x=2, así que corta el eje X en <strong>(2, 0)</strong>.',
+        graph: { kind: 'linear', fn: x => 3*x - 6, xMin: -1, xMax: 4, xLabel: 'x', yLabel: 'f(x) = 3x − 6', points: [{x:0, y:-6, label:'(0,−6)'}, {x:2, y:0, label:'(2,0)'}] }
+      },
+      {
+        id: 'dom-restringido',
+        title: 'Dominio restringido',
+        statement: 'Analiza el dominio de las funciones f(x) = 1/x y g(x) = 1/(x−3).',
+        steps: [
+          { type: 'mc', prompt: '¿Por qué el dominio de f(x) = 1/x excluye a x = 0?', options: ['Porque la división entre cero no está definida', 'Porque 0 no es un número real', 'Porque f(0) sería negativo'], correct: 0, hint: 'No existe ningún número que sea el resultado de dividir entre cero.' },
+          { type: 'mc', prompt: '¿Cuál es el dominio de f(x) = 1/x?', options: ['Todos los reales', 'Todos los reales excepto 0', 'Solo los positivos'], correct: 1, hint: 'Se excluye únicamente el valor que anula el denominador.' },
+          { type: 'num', prompt: 'Para g(x) = 1/(x−3), ¿qué valor de x hace que el denominador sea cero?', correct: 3, tolerance: 0.01, hint: 'Resuelve x − 3 = 0.' },
+          { type: 'mc', prompt: 'Por lo tanto, ¿cuál es el dominio de g(x) = 1/(x−3)?', options: ['Todos los reales excepto 3', 'Todos los reales excepto 0', 'Todos los reales'], correct: 0, hint: 'Se excluye el valor de x que hace cero al denominador.' }
+        ],
+        summary: 'En f(x)=1/x, el dominio es <strong>todos los reales excepto 0</strong>. En g(x)=1/(x−3), el denominador se anula en x=3, así que su dominio es <strong>todos los reales excepto 3</strong>.',
+        graph: null
+      }
+    ]
+  },
+  {
+    id: 'operaciones-funciones',
+    icon: '➗',
+    name: 'Operaciones entre funciones',
+    desc: 'Suma, resta, producto y cociente de dos funciones, y su dominio.',
+    concept: '<p>Sean f y g dos funciones:</p><ul><li>Suma: (f+g)(x) = f(x)+g(x)</li><li>Resta: (f−g)(x) = f(x)−g(x)</li><li>Producto: (f·g)(x) = f(x)·g(x)</li><li>Cociente: (f/g)(x) = f(x)/g(x), con g(x)≠0</li></ul><p><strong>Dominio:</strong> la intersección de los dominios de f y g (en el cociente, además se excluye donde g(x)=0).</p>',
+    problems: [
+      {
+        id: 'oper-polinomiales',
+        title: 'Combina funciones polinomiales',
+        statement: 'Sean f(x) = 3x + 2 y g(x) = x² − 1. Calcula las operaciones entre ellas evaluadas en x = 2.',
+        steps: [
+          { type: 'num', prompt: 'Calcula f(2).', correct: 8, tolerance: 0.01, hint: 'f(2) = 3(2) + 2.' },
+          { type: 'num', prompt: 'Calcula g(2).', correct: 3, tolerance: 0.01, hint: 'g(2) = 2² − 1.' },
+          { type: 'num', prompt: 'Calcula (f+g)(2) = f(2) + g(2).', correct: 11, tolerance: 0.01, hint: '8 + 3.' },
+          { type: 'num', prompt: 'Calcula (f·g)(2) = f(2) · g(2).', correct: 24, tolerance: 0.01, hint: '8 × 3.' },
+          { type: 'mc', prompt: '¿Para qué valores de x NO está definido (f/g)(x) = f(x)/g(x)?', options: ['x = ±1, porque ahí g(x) = 0', 'x = 0, porque ahí f(x) = 0', 'Está definido para todo x'], correct: 0, hint: 'El cociente no está definido donde el denominador g(x) es cero: x²−1=0.' }
+        ],
+        summary: 'f(2)=8 y g(2)=3, así que (f+g)(2)=11, (f−g)(2)=5, (f·g)(2)=24 y (f/g)(2)≈2.67. El dominio del cociente excluye x=±1, porque ahí g(x)=x²−1=0.',
+        graph: null
+      },
+      {
+        id: 'oper-dominio-raices',
+        title: 'Dominio de una suma con raíces',
+        statement: 'Sean f(x) = √x y g(x) = √(4 − x). Determina el dominio de f, de g, y de su suma (f+g)(x).',
+        steps: [
+          { type: 'mc', prompt: '¿Cuál es el dominio de f(x) = √x?', options: ['x ≥ 0', 'x ≤ 0', 'Todos los reales'], correct: 0, hint: 'No se puede sacar raíz cuadrada real de un número negativo.' },
+          { type: 'mc', prompt: '¿Cuál es el dominio de g(x) = √(4 − x)?', options: ['x ≥ 4', 'x ≤ 4', 'x ≠ 4'], correct: 1, hint: 'Necesitas que 4 − x ≥ 0.' },
+          { type: 'mc', prompt: 'El dominio de (f+g)(x) es la intersección de ambos dominios. ¿Cuál es?', options: ['[0, 4]', '(−∞, 4]', '[0, +∞)'], correct: 0, hint: 'Intersección de x≥0 con x≤4.' },
+          { type: 'num', prompt: 'Evalúa (f+g)(x) en x = 4: f(4) + g(4).', correct: 2, tolerance: 0.01, hint: 'f(4)=√4=2, g(4)=√0=0.' }
+        ],
+        summary: 'Dom(f) = [0, +∞), Dom(g) = (−∞, 4]. Su intersección (dominio de f+g) es <strong>[0, 4]</strong>. En x=4: (f+g)(4) = 2 + 0 = <strong>2</strong>.',
+        graph: null
+      },
+      {
+        id: 'oper-utilidad',
+        title: 'Aplicación: la utilidad de una empresa',
+        statement: 'Una empresa tiene costo de producción C(x) = 500 + 20x e ingreso por ventas I(x) = 45x, donde x son las unidades producidas y vendidas. Encuentra la función de utilidad U(x) = I(x) − C(x), evalúala en x=50 y halla el punto de equilibrio (donde U(x)=0).',
+        steps: [
+          { type: 'mc', prompt: '¿Cuál es la función de utilidad U(x) = I(x) − C(x) simplificada?', options: ['U(x) = 25x − 500', 'U(x) = 65x + 500', 'U(x) = 25x + 500'], correct: 0, hint: 'U(x) = 45x − (500 + 20x). Distribuye el signo negativo y combina términos semejantes.' },
+          { type: 'num', prompt: 'Calcula la utilidad cuando se producen y venden 50 unidades: U(50).', correct: 750, tolerance: 1, hint: 'U(50) = 25(50) − 500.' },
+          { type: 'num', prompt: 'Encuentra el punto de equilibrio resolviendo U(x) = 0 (25x − 500 = 0).', correct: 20, tolerance: 0.1, hint: '25x = 500.' },
+          { type: 'mc', prompt: 'En el punto de equilibrio (x=20), ¿qué relación hay entre el ingreso y el costo?', options: ['El ingreso es mayor que el costo', 'El ingreso es igual al costo', 'El costo es mayor que el ingreso'], correct: 1, hint: 'Si la utilidad es 0, es porque I(x) − C(x) = 0, es decir I(x) = C(x).' }
+        ],
+        summary: 'La resta de funciones da <span class="eq">U(x) = 45x − (500+20x) = 25x − 500</span>. Con 50 unidades: U(50) = <strong>$750</strong> de ganancia. El punto de equilibrio es <span class="eq">25x=500 → x=20</span> unidades, donde ingreso y costo se igualan ($900 = $900).',
+        graph: { kind: 'linear', fn: x => 25*x - 500, xMin: 0, xMax: 55, xLabel: 'x (unidades)', yLabel: 'U (utilidad en $)', points: [{x:20, y:0, label:'equilibrio x=20'}, {x:50, y:750, label:'x=50 → $750'}] }
+      }
+    ]
+  },
+  {
+    id: 'composicion',
+    icon: '🔗',
+    name: 'Composición y descomposición',
+    desc: 'Combina funciones aplicando (f∘g)(x) = f(g(x)), y aprende a descomponerlas.',
+    concept: '<p><strong>Composición:</strong> (f∘g)(x) = f(g(x)) — primero se aplica g, luego f al resultado. En general <strong>f∘g ≠ g∘f</strong>, el orden importa.</p><p><strong>Dominio de la composición:</strong> x debe estar en el dominio de g, y g(x) debe estar en el dominio de f.</p><p><strong>Descomponer</strong> es el proceso inverso: encontrar funciones simples f y g tales que f(g(x)) sea igual a una función más compleja h(x).</p>',
+    problems: [
+      {
+        id: 'comp-orden',
+        title: 'Compón y verifica el orden',
+        statement: 'Sean f(x) = x² y g(x) = 2x + 1. Calcula (f∘g)(x) y (g∘f)(x), y compara los resultados en x = 3.',
+        steps: [
+          { type: 'mc', prompt: '¿Qué significa (f∘g)(x)?', options: ['f(g(x)): aplicar primero g y luego f', 'g(f(x)): aplicar primero f y luego g', 'f(x) · g(x)'], correct: 0, hint: 'Se lee "f de g de x": g actúa primero, su resultado entra a f.' },
+          { type: 'num', prompt: 'Calcula g(3).', correct: 7, tolerance: 0.01, hint: 'g(3) = 2(3) + 1.' },
+          { type: 'num', prompt: 'Calcula f(g(3)) = f(7), es decir (f∘g)(3).', correct: 49, tolerance: 0.01, hint: 'f(7) = 7².' },
+          { type: 'num', prompt: 'Ahora calcula (g∘f)(3): primero f(3), luego aplica g a ese resultado.', correct: 19, tolerance: 0.01, hint: 'f(3) = 9. Luego g(9) = 2(9) + 1.' },
+          { type: 'mc', prompt: 'Como (f∘g)(3) = 49 y (g∘f)(3) = 19, ¿qué concluyes?', options: ['f∘g = g∘f siempre', 'En general f∘g ≠ g∘f: el orden importa', 'El resultado no depende del orden'], correct: 1, hint: 'Los dos resultados son diferentes (49 ≠ 19).' }
+        ],
+        summary: '(f∘g)(3) = f(g(3)) = f(7) = <strong>49</strong>. (g∘f)(3) = g(f(3)) = g(9) = <strong>19</strong>. Como 49 ≠ 19, se confirma que <strong>f∘g ≠ g∘f</strong> en general: el orden de composición importa.',
+        graph: null
+      },
+      {
+        id: 'comp-descompone',
+        title: 'Descompón una función',
+        statement: 'Descompón la función h(x) = (2x + 3)⁴ en dos funciones más simples f y g tales que h(x) = f(g(x)).',
+        steps: [
+          { type: 'mc', prompt: "¿Cuál es la operación 'exterior' que se aplica al final en h(x) = (2x+3)⁴?", options: ['Elevar a la cuarta potencia', 'Multiplicar por 2', 'Sumar 3'], correct: 0, hint: 'Piensa en el último paso que harías si calcularas h(x) a mano.' },
+          { type: 'mc', prompt: 'Entonces, ¿cuál es la función simple f(x)?', options: ['f(x) = x⁴', 'f(x) = 2x + 3', 'f(x) = 4x'], correct: 0, hint: 'f representa la operación exterior aplicada a "lo que sea que entre".' },
+          { type: 'mc', prompt: "¿Cuál es la expresión 'interior' g(x)?", options: ['g(x) = x⁴', 'g(x) = 2x + 3', 'g(x) = 4'], correct: 1, hint: 'g es todo lo que está dentro del paréntesis antes de elevar a la cuarta.' },
+          { type: 'num', prompt: 'Verifica calculando f(g(2)): primero g(2) = 2(2)+3 = 7, luego f(7) = 7⁴. ¿Cuánto da?', correct: 2401, tolerance: 1, hint: '7⁴ = 7×7×7×7.' }
+        ],
+        summary: 'La operación exterior es "elevar a la cuarta", así que f(x)=x⁴, y lo interior es g(x)=2x+3. Verificación en x=2: g(2)=7, f(7)=7⁴=<strong>2401</strong>, que coincide con h(2)=(2·2+3)⁴=7⁴.',
+        graph: null
+      },
+      {
+        id: 'comp-triple',
+        title: 'Composición triple',
+        statement: 'Sean f(x) = x + 2, g(x) = 3x y h(x) = x². Calcula (f∘g∘h)(x) y evalúa en x = 2.',
+        steps: [
+          { type: 'mc', prompt: 'En (f∘g∘h)(x), ¿cuál función se aplica primero?', options: ['h(x), la que está más a la derecha', 'f(x), la que está más a la izquierda', 'g(x), la del medio'], correct: 0, hint: 'La composición se lee de adentro hacia afuera: primero la función más "interior".' },
+          { type: 'num', prompt: 'Aplica h primero: calcula h(2).', correct: 4, tolerance: 0.01, hint: 'h(2) = 2².' },
+          { type: 'num', prompt: 'Ahora aplica g al resultado: calcula g(h(2)) = g(4).', correct: 12, tolerance: 0.01, hint: 'g(4) = 3(4).' },
+          { type: 'num', prompt: 'Por último aplica f: calcula f(g(h(2))) = f(12), es decir (f∘g∘h)(2).', correct: 14, tolerance: 0.01, hint: 'f(12) = 12 + 2.' }
+        ],
+        summary: 'Se aplica de adentro hacia afuera: h(2)=4, luego g(4)=12, luego f(12)=<strong>14</strong>. En general (f∘g∘h)(x) = f(g(h(x))) = f(g(x²)) = f(3x²) = 3x² + 2, y evaluado en x=2 da 3(4)+2=14 ✓.',
+        graph: null
+      },
+      {
+        id: 'comp-dominio-desigualdad',
+        title: 'Dominio de una composición con desigualdad',
+        statement: 'Si f(x) = x² − 4 y g(x) = √x, encuentra el dominio de (g∘f)(x).',
+        steps: [
+          { type: 'mc', prompt: '¿Cuál es la expresión de (g∘f)(x) = g(f(x))?', options: ['√(x² − 4)', '(√x)² − 4', 'x² − 4'], correct: 0, hint: 'Sustituye f(x) = x²−4 dentro de g(x) = √x.' },
+          { type: 'mc', prompt: 'Para que la raíz esté definida, ¿qué condición necesitamos sobre x² − 4?', options: ['x² − 4 ≥ 0', 'x² − 4 ≤ 0', 'x² − 4 ≠ 0'], correct: 0, hint: 'El contenido de una raíz cuadrada real nunca puede ser negativo.' },
+          { type: 'mc', prompt: 'Resolviendo x² ≥ 4, es decir |x| ≥ 2, ¿cuál es el dominio de (g∘f)(x)?', options: ['(−∞, −2] ∪ [2, +∞)', '[−2, 2]', 'Todos los reales'], correct: 0, hint: '|x| ≥ 2 significa que x está lejos de cero, por fuera del intervalo [−2,2].' },
+          { type: 'num', prompt: 'Verifica evaluando (g∘f)(x) en x = 3 (que sí debería estar en el dominio): calcula √(3² − 4).', correct: 2.236, tolerance: 0.05, hint: '3² − 4 = 5, y √5 ≈ 2.236.' }
+        ],
+        summary: '(g∘f)(x) = √(x²−4), que exige x²−4 ≥ 0, es decir |x| ≥ 2. El dominio es <strong>(−∞,−2] ∪ [2,+∞)</strong>. Por ejemplo en x=0 no está definida (√−4), pero en x=3 sí: √5 ≈ 2.24.',
+        graph: null
+      }
+    ]
+  },
+  {
+    id: 'inversas',
+    icon: '🔄',
+    name: 'Funciones inversas',
+    desc: 'Verifica si una función es uno a uno y encuentra su función inversa.',
+    concept: '<p>La inversa f⁻¹ deshace lo que hace f: f⁻¹(f(x)) = x y f(f⁻¹(x)) = x.</p><ul><li><strong>Existe solo si f es uno a uno</strong> (prueba de la línea horizontal: cada línea horizontal corta la gráfica en un solo punto).</li><li><strong>Método:</strong> escribe y = f(x) → intercambia x e y → despeja y → esa es f⁻¹(x).</li><li>Dom(f⁻¹) = Ran(f) y Ran(f⁻¹) = Dom(f). Las gráficas de f y f⁻¹ son simétricas respecto a la recta y = x.</li></ul>',
+    problems: [
+      {
+        id: 'inv-metodo',
+        title: '¿Es uno a uno? Encuentra la inversa',
+        statement: 'Determina si f(x) = 3x + 7 tiene inversa, y si la tiene, encuéntrala usando el método de 3 pasos: escribir y = f(x), intercambiar x e y, y despejar y.',
+        steps: [
+          { type: 'mc', prompt: '¿Qué condición debe cumplir f para tener inversa?', options: ['Ser una función par', 'Ser uno a uno (inyectiva)', 'Ser cuadrática'], correct: 1, hint: 'Si dos entradas distintas dieran la misma salida, no sabrías a cuál regresar.' },
+          { type: 'mc', prompt: 'f(x) = 3x+7 es una función lineal con m = 3 ≠ 0. ¿Es uno a uno?', options: ['Sí', 'No', 'Depende de x'], correct: 0, hint: 'Toda función lineal con pendiente distinta de cero es uno a uno.' },
+          { type: 'mc', prompt: 'Paso 1: escribe y = 3x+7. Paso 2: intercambia x e y. ¿Qué ecuación obtienes?', options: ['x = 3y + 7', 'y = 3x + 7', 'x = 3x + 7'], correct: 0, hint: 'Simplemente cambia cada x por y y cada y por x.' },
+          { type: 'num', prompt: 'Paso 3: despeja y de x = 3y+7. Si x=22, ¿cuánto vale y (es decir, f⁻¹(22))?', correct: 5, tolerance: 0.01, hint: 'y = (x − 7)/3 = (22 − 7)/3.' }
+        ],
+        summary: 'Como m=3≠0, f es uno a uno y tiene inversa. Siguiendo los 3 pasos: <span class="eq">f⁻¹(x) = (x − 7)/3</span>. Verificación: f⁻¹(22) = (22−7)/3 = <strong>5</strong>, y en efecto f(5)=3(5)+7=22 ✓.',
+        graph: null
+      },
+      {
+        id: 'inv-propiedades',
+        title: 'Propiedades: dominio, rango y simetría',
+        statement: 'La fórmula para convertir Celsius a Fahrenheit es F(C) = (9/5)C + 32. Encuentra la función inversa que convierte de Fahrenheit a Celsius, y verifica sus propiedades.',
+        steps: [
+          { type: 'mc', prompt: 'Para encontrar la inversa, intercambiamos las variables y despejamos. ¿Cuál es la fórmula C(F) resultante?', options: ['C(F) = (5/9)(F − 32)', 'C(F) = (9/5)(F + 32)', 'C(F) = (5/9)F + 32'], correct: 0, hint: 'De F = (9/5)C + 32, despeja C: primero resta 32, luego multiplica por 5/9.' },
+          { type: 'num', prompt: 'Usa C(F) = (5/9)(F−32) para convertir 98.6°F a Celsius.', correct: 37, tolerance: 0.5, hint: '(5/9)(98.6 − 32) = (5/9)(66.6).' },
+          { type: 'mc', prompt: 'Si el punto (25, 77) está en F(C), ¿qué punto correspondiente está en su inversa C(F)?', options: ['(77, 25)', '(25, 77)', '(−25, −77)'], correct: 0, hint: 'Si (a,b) está en f, entonces (b,a) está en f⁻¹.' },
+          { type: 'mc', prompt: 'Esta propiedad de puntos invertidos (a,b) → (b,a) refleja que las gráficas de f y f⁻¹ son simétricas respecto a...', options: ['El eje X', 'El eje Y', 'La recta y = x'], correct: 2, hint: 'Intercambiar las coordenadas de un punto equivale a reflejarlo sobre esa recta.' }
+        ],
+        summary: 'La inversa es <span class="eq">C(F) = (5/9)(F − 32)</span>. Convierte 98.6°F a <strong>37°C</strong>. El punto (25,77) de F(C) corresponde a (77,25) en C(F), reflejando la simetría de f y f⁻¹ respecto a la recta <strong>y = x</strong>.',
+        graph: null
+      },
+      {
+        id: 'inv-verifica-composicion',
+        title: 'Verifica que dos funciones son inversas',
+        statement: 'Dadas f(x) = 3x − 1 y g(x) = x/3 + 1/3, comprueba si son funciones inversas calculando f(g(x)) y g(f(x)).',
+        steps: [
+          { type: 'mc', prompt: '¿Qué debemos comprobar para confirmar que f y g son inversas entre sí?', options: ['Que f(g(x)) = x y g(f(x)) = x', 'Que f(x) = g(x) para todo x', 'Que f(0) = g(0)'], correct: 0, hint: 'Una función inversa "deshace" lo que hace la otra, regresando siempre a x.' },
+          { type: 'num', prompt: 'Calcula f(g(x)) sustituyendo g(x) = x/3 + 1/3 en f. Evalúa el resultado en x = 6 (debería dar 6 si son inversas).', correct: 6, tolerance: 0.01, hint: 'g(6) = 6/3 + 1/3 = 7/3. Luego f(7/3) = 3(7/3) − 1.' },
+          { type: 'num', prompt: 'Ahora calcula g(f(x)) evaluado en x = 6 (también debería dar 6).', correct: 6, tolerance: 0.01, hint: 'f(6) = 3(6) − 1 = 17. Luego g(17) = 17/3 + 1/3.' },
+          { type: 'mc', prompt: 'Como f(g(x)) = x y g(f(x)) = x se cumplen, ¿qué concluyes?', options: ['f y g son funciones inversas', 'f y g son iguales', 'No hay relación entre f y g'], correct: 0, hint: 'Esa es exactamente la condición que define a dos funciones inversas.' }
+        ],
+        summary: 'f(g(x)) = 3(x/3+1/3)−1 = x+1−1 = x, y g(f(x)) = (3x−1)/3 + 1/3 = x. Como ambas composiciones devuelven x, <strong>f y g son funciones inversas</strong> (f⁻¹=g y g⁻¹=f). Verificado en x=6: f(g(6))=6 y g(f(6))=6.',
+        graph: null
+      }
+    ]
+  },
+  {
+    id: 'taller',
+    icon: '🧪',
+    name: 'Taller práctico: refuerzo',
+    desc: 'Práctica adicional mezclando operaciones y composición de funciones, tomada de tu taller de clase.',
+    concept: '<p>Este taller combina todo lo visto: <strong>suma, resta, producto y cociente</strong> de funciones (con su dominio), <strong>composición</strong> (y su falta de conmutatividad), y casos donde la composición se "cancela". Repasa las fórmulas en los temas anteriores si necesitas recordarlas.</p>',
+    problems: [
+      {
+        id: 'taller-1',
+        title: 'Operaciones aritméticas: paso a paso',
+        statement: 'Sean f(x) = 3x − 2 y g(x) = x² + 1. Encuentra (f+g)(x), (f−g)(x), (f·g)(x), y evalúa (f+g)(2).',
+        steps: [
+          { type: 'mc', prompt: '¿Cuál es (f+g)(x)?', options: ['x² + 3x − 1', 'x² − 3x − 1', 'x² + 3x + 1'], correct: 0, hint: 'Suma término a término: (3x−2) + (x²+1).' },
+          { type: 'mc', prompt: '¿Cuál es (f−g)(x)?', options: ['−x² + 3x − 3', 'x² + 3x − 3', '−x² − 3x + 3'], correct: 0, hint: '(3x−2) − (x²+1). No olvides distribuir el signo negativo en todo g(x).' },
+          { type: 'mc', prompt: '¿Cuál es (f·g)(x)?', options: ['3x³ − 2x² + 3x − 2', '3x³ + 2x² − 3x + 2', '3x² − 2x + 1'], correct: 0, hint: 'Multiplica (3x−2)(x²+1) usando la propiedad distributiva y ordena los términos.' },
+          { type: 'num', prompt: 'Usando la función suma que encontraste, evalúa (f+g)(2).', correct: 9, tolerance: 0.01, hint: '(f+g)(2) = 2² + 3(2) − 1.' }
+        ],
+        summary: '(f+g)(x)=x²+3x−1, (f−g)(x)=−x²+3x−3, (f·g)(x)=3x³−2x²+3x−2. Evaluando: (f+g)(2)=4+6−1=<strong>9</strong> (se puede verificar con f(2)=4 y g(2)=5: 4+5=9 ✓).',
+        graph: null
+      },
+      {
+        id: 'taller-2',
+        title: 'División de funciones y su dominio',
+        statement: 'Sean f(x) = 2x + 3 y g(x) = x² − 4. Encuentra (f/g)(x) y su dominio.',
+        steps: [
+          { type: 'mc', prompt: '¿Cuál es (f/g)(x)?', options: ['(2x+3)/(x²−4)', '(x²−4)/(2x+3)', '(2x−3)/(x²+4)'], correct: 0, hint: '(f/g)(x) = f(x)/g(x), simplemente coloca f(x) sobre g(x).' },
+          { type: 'num', prompt: '¿Para qué valor positivo de x el denominador x²−4 se hace cero?', correct: 2, tolerance: 0.01, hint: 'Factoriza: x²−4 = (x−2)(x+2) = 0.' },
+          { type: 'mc', prompt: 'Considerando también su valor negativo, ¿cuál es el dominio de (f/g)(x)?', options: ['ℝ − {−2, 2}', 'ℝ − {2}', 'Todos los reales'], correct: 0, hint: 'El denominador se anula en x=2 y también en x=−2.' }
+        ],
+        summary: '(f/g)(x) = (2x+3)/(x²−4). Como x²−4=0 en x=±2, el dominio excluye ambos valores: <strong>Dom(f/g) = ℝ − {−2, 2}</strong>.',
+        graph: null
+      },
+      {
+        id: 'taller-3',
+        title: 'Composición y su falta de conmutatividad',
+        statement: 'Sean f(x) = 2x + 1 y g(x) = x² − 3. Calcula (f∘g)(x), (g∘f)(x), y verifica si son iguales.',
+        steps: [
+          { type: 'mc', prompt: '¿Cuál es (f∘g)(x) = f(g(x))?', options: ['2x² − 5', '4x² + 4x − 2', '2x² − 3'], correct: 0, hint: 'Sustituye g(x)=x²−3 en f: 2(x²−3)+1.' },
+          { type: 'mc', prompt: '¿Cuál es (g∘f)(x) = g(f(x))?', options: ['4x² + 4x − 2', '2x² − 5', '4x² − 2'], correct: 0, hint: 'Sustituye f(x)=2x+1 en g: (2x+1)²−3. Expande el binomio con cuidado.' },
+          { type: 'mc', prompt: '¿(f∘g)(x) y (g∘f)(x) son iguales?', options: ['Sí, son iguales', 'No, son distintas'], correct: 1, hint: 'Compara 2x²−5 con 4x²+4x−2: no son la misma expresión.' }
+        ],
+        summary: '(f∘g)(x) = 2x²−5 y (g∘f)(x) = 4x²+4x−2. Como son expresiones distintas, se confirma una vez más que <strong>la composición no es conmutativa</strong>.',
+        graph: null
+      },
+      {
+        id: 'taller-4',
+        title: 'Composición radical y su dominio',
+        statement: 'Sean f(x) = √x y g(x) = x + 5. Encuentra (f∘g)(x), su dominio, y evalúa (f∘g)(4).',
+        steps: [
+          { type: 'mc', prompt: '¿Cuál es (f∘g)(x)?', options: ['√(x+5)', '√x + 5', 'x+5'], correct: 0, hint: 'Sustituye g(x)=x+5 dentro de f(x)=√x.' },
+          { type: 'mc', prompt: '¿Cuál es el dominio de (f∘g)(x)?', options: ['[−5, +∞)', '[0, +∞)', 'Todos los reales'], correct: 0, hint: 'Necesitas que lo que está dentro de la raíz sea ≥ 0: x+5 ≥ 0.' },
+          { type: 'num', prompt: 'Evalúa (f∘g)(4).', correct: 3, tolerance: 0.01, hint: '(f∘g)(4) = √(4+5) = √9.' }
+        ],
+        summary: '(f∘g)(x) = √(x+5), con dominio <strong>[−5, +∞)</strong> (pues x+5≥0 → x≥−5). En x=4: (f∘g)(4) = √9 = <strong>3</strong>.',
+        graph: { kind: 'linear', fn: x => Math.sqrt(Math.max(0, x+5)), xMin: -5, xMax: 10, xLabel: 'x', yLabel: '(f∘g)(x) = √(x+5)', points: [{x:4, y:3, label:'(4,3)'}, {x:-5, y:0, label:'inicio del dominio'}] }
+      },
+      {
+        id: 'taller-5',
+        title: 'Operaciones combinadas: (f+g)·g',
+        statement: 'Sean f(x) = x² y g(x) = 2x − 1. Calcula [(f+g)·g](x) y evalúa el resultado en x = 3.',
+        steps: [
+          { type: 'mc', prompt: 'Primero, ¿cuál es (f+g)(x)?', options: ['x² + 2x − 1', 'x² − 2x + 1', '2x² − 1'], correct: 0, hint: 'Suma f(x)=x² y g(x)=2x−1 directamente.' },
+          { type: 'num', prompt: 'Ahora multiplica (f+g)(x) por g(x) y evalúa [(f+g)·g](3).', correct: 70, tolerance: 0.5, hint: 'Puedes evaluar directo: (f+g)(3) × g(3). f(3)=9, g(3)=5, entonces (f+g)(3)=14.' }
+        ],
+        summary: '(f+g)(x) = x²+2x−1. Evaluando en x=3: (f+g)(3)=14 y g(3)=5, así que [(f+g)·g](3) = 14×5 = <strong>70</strong>.',
+        graph: null
+      },
+      {
+        id: 'taller-6',
+        title: 'Composición y dominio con funciones racionales',
+        statement: 'Sean f(x) = 1/x y g(x) = x + 3. Encuentra (f∘g)(x) y (g∘f)(x), junto con sus dominios.',
+        steps: [
+          { type: 'mc', prompt: '¿Cuál es (f∘g)(x)?', options: ['1/(x+3)', '1/x + 3', 'x+3'], correct: 0, hint: 'Sustituye g(x)=x+3 en f(x)=1/x.' },
+          { type: 'mc', prompt: '¿Cuál es el dominio de (f∘g)(x)?', options: ['ℝ − {−3}', 'ℝ − {0}', 'ℝ − {3}'], correct: 0, hint: 'El denominador x+3 no puede ser cero.' },
+          { type: 'mc', prompt: '¿Cuál es (g∘f)(x)?', options: ['(1+3x)/x', '1/(x+3)', '3/x + 1'], correct: 0, hint: 'Sustituye f(x)=1/x en g(x)=x+3: 1/x + 3, y súmalo con denominador común.' },
+          { type: 'mc', prompt: '¿Cuál es el dominio de (g∘f)(x)?', options: ['ℝ − {0}', 'ℝ − {−3}', 'ℝ'], correct: 0, hint: 'f(x)=1/x ya excluye x=0 desde el inicio.' }
+        ],
+        summary: '(f∘g)(x)=1/(x+3), Dom=ℝ−{−3}. (g∘f)(x)=(1+3x)/x, Dom=ℝ−{0}. Aunque usan las mismas funciones, dan resultados y dominios distintos: la composición no es conmutativa.',
+        graph: null
+      },
+      {
+        id: 'taller-7',
+        title: 'Verdadero o falso: identifica la afirmación correcta',
+        statement: 'Sean f(x) = 2x y g(x) = x + 5. Evalúa si cada afirmación es verdadera o falsa, y encuentra la expresión correcta de (f∘g)(x).',
+        steps: [
+          { type: 'mc', prompt: '¿Es verdadero que (f+g)(x) = 2x² + 10x?', options: ['Verdadero', 'Falso — en realidad (f+g)(x) = 3x + 5'], correct: 1, hint: '(f+g)(x) = 2x + (x+5). No hay ninguna multiplicación aquí.' },
+          { type: 'mc', prompt: '¿Es verdadero que (f·g)(x) = 2x + 5?', options: ['Verdadero', 'Falso — en realidad (f·g)(x) = 2x² + 10x'], correct: 1, hint: '(f·g)(x) = (2x)(x+5). Aplica la propiedad distributiva.' },
+          { type: 'mc', prompt: '¿Cuál es la expresión correcta de (f∘g)(x)?', options: ['2x + 10', '2x + 5', '2x² + 10x'], correct: 0, hint: '(f∘g)(x) = f(g(x)) = f(x+5) = 2(x+5).' },
+          { type: 'num', prompt: 'Verifica evaluando (f∘g)(3) con la fórmula que encontraste.', correct: 16, tolerance: 0.01, hint: '2(3) + 10.' }
+        ],
+        summary: '(f+g)(x)=3x+5 (no 2x²+10x) y (f·g)(x)=2x²+10x (no 2x+5) — ambas afirmaciones originales eran falsas. La única verdadera es <strong>(f∘g)(x) = 2x+10</strong>, verificado en x=3: (f∘g)(3)=16.',
+        graph: null
+      },
+      {
+        id: 'taller-8',
+        title: 'Una composición que se cancela',
+        statement: 'Sean f(x) = x² − 1 y g(x) = √(x + 1). Calcula (f∘g)(3) y observa qué patrón aparece.',
+        steps: [
+          { type: 'num', prompt: 'Calcula g(3).', correct: 2, tolerance: 0.01, hint: 'g(3) = √(3+1) = √4.' },
+          { type: 'num', prompt: 'Calcula f(g(3)) = f(2), es decir (f∘g)(3).', correct: 3, tolerance: 0.01, hint: 'f(2) = 2² − 1.' },
+          { type: 'mc', prompt: 'En general, (f∘g)(x) = (√(x+1))² − 1 = x. ¿Qué significa esto?', options: ['f∘g es la función identidad en su dominio: "deshace" y "rehace" el mismo valor', 'f y g son inversas en cualquier orden', 'El resultado no tiene ningún significado especial'], correct: 0, hint: 'Cuando f(g(x)) = x para todo x del dominio, decimos que la composición actúa como la función identidad.' }
+        ],
+        summary: 'g(3)=2 y f(2)=3, así que (f∘g)(3)=<strong>3</strong>. De hecho (f∘g)(x) = (√(x+1))²−1 = x siempre: f "deshace" lo que hace g en este orden, aunque eso no basta para decir que son inversas completas (habría que comprobar también g∘f).',
+        graph: null
+      }
+    ]
+  }
+];
+
+/* ---------- Estado ---------- */
+const state = {
+  screen: 'home',      // home | category | problem | create
+  categoryId: null,
+  problemId: null,
+  stepIndex: 0,
+  stepStates: [],       // { answered, correct, attempts, hintShown, userLabel }
+  createTarget: '__new__',
+  createDraft: null,
+  createError: ''
+};
+const completed = new Set();
+let customIdCounter = 0;
+
+function findCategory(id) { return CATEGORIES.find(c => c.id === id); }
+function findProblem(catId, probId) {
+  const cat = findCategory(catId);
+  return cat ? cat.problems.find(p => p.id === probId) : null;
+}
+function totalProblems() { return CATEGORIES.reduce((s,c) => s + c.problems.length, 0); }
+
+/* ---------- Render ---------- */
+const app = document.getElementById('app');
+
+function render() {
+  if (state.screen === 'home') renderHome();
+  else if (state.screen === 'category') renderCategoryView();
+  else if (state.screen === 'problem') renderProblemView();
+  else if (state.screen === 'create') renderCreateView();
+}
+
+function renderHome() {
+  const done = completed.size;
+  const total = totalProblems();
+  const pct = total ? Math.round((done/total)*100) : 0;
+
+  let html = `
+    <header class="top">
+      <span class="demo-badge">Demo</span>
+      <h1>Aprende Ecuaciones y Funciones desde Problemas</h1>
+      <p class="sub">Elige un tema, resuelve problemas de la vida real paso a paso y recibe retroalimentación inmediata.</p>
+      <div class="overall-progress">
+        <div class="bar"><div style="width:${pct}%"></div></div>
+        <div class="label">${done}/${total} problemas completados</div>
+      </div>
+    </header>
+    <div class="cards-grid">
+  `;
+  CATEGORIES.forEach(cat => {
+    const catDone = cat.problems.filter(p => completed.has(p.id)).length;
+    const catPct = Math.round((catDone / cat.problems.length) * 100);
+    html += `
+      <button class="card" onclick="goCategory('${cat.id}')">
+        <span class="icon">${cat.icon}</span>
+        <h3>${cat.name}</h3>
+        <p>${cat.desc}</p>
+        <div class="progress-line">
+          <div class="mini-bar"><div style="width:${catPct}%"></div></div>
+          <span>${catDone}/${cat.problems.length}</span>
+        </div>
+      </button>
+    `;
+  });
+  html += `
+      <button class="card create-card" onclick="goCreate('__new__')">
+        <span class="icon">➕</span>
+        <h3>Crear tu propio problema</h3>
+        <p>Escribe tu propio enunciado y pasos, con tus propias preguntas y respuestas.</p>
+      </button>
+    </div>
+  `;
+  app.innerHTML = html;
+}
+
+function renderCategoryView() {
+  const cat = findCategory(state.categoryId);
+  let html = `
+    <button class="btn-back" onclick="goHome()">← Volver a temas</button>
+    <header class="top">
+      <span class="demo-badge">${cat.icon} ${cat.name}</span>
+      <h1>${cat.name}</h1>
+      <p class="sub">${cat.desc}</p>
+    </header>
+    ${cat.concept ? `<div class="concept-box"><div class="concept-label">📘 Conceptos clave</div>${cat.concept}</div>` : ''}
+    <div class="problem-list">
+  `;
+  if (cat.problems.length === 0) {
+    html += `<p style="color:var(--muted); font-size:14px;">Todavía no hay problemas aquí. ¡Agrega el primero!</p>`;
+  }
+  cat.problems.forEach(p => {
+    const done = completed.has(p.id);
+    html += `
+      <div class="problem-row">
+        <div class="info">
+          <h4>${p.title} ${p.custom ? '<span class="custom-badge">Tuyo</span>' : ''}</h4>
+          <p>${p.statement}</p>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+          <div class="check-dot ${done ? 'done' : ''}">${done ? '✓' : ''}</div>
+          <button class="btn-primary" onclick="goProblem('${cat.id}','${p.id}')">${done ? 'Repasar' : 'Resolver'}</button>
+          ${p.custom ? `<button class="btn-secondary delete-btn" title="Eliminar problema" onclick="deleteCustomProblem('${cat.id}','${p.id}')">🗑️</button>` : ''}
+        </div>
+      </div>
+    `;
+  });
+  html += `
+    </div>
+    <div class="actions-row" style="justify-content:flex-start; margin-top:18px;">
+      <button class="btn-secondary" onclick="goCreate('${cat.id}')">+ Agregar un problema aquí</button>
+    </div>
+  `;
+  app.innerHTML = html;
+}
+
+function deleteCustomProblem(catId, probId) {
+  const cat = findCategory(catId);
+  if (!cat) return;
+  cat.problems = cat.problems.filter(p => p.id !== probId);
+  completed.delete(probId);
+  render();
+}
+
+function initStepStates(problem) {
+  state.stepStates = problem.steps.map(() => ({ answered: false, correct: false, attempts: 0, hintShown: false, chosenIndex: null, chosenValue: null, workText: '' }));
+}
+
+function goHome() { state.screen = 'home'; render(); }
+function goCategory(catId) { state.screen = 'category'; state.categoryId = catId; render(); }
+function goProblem(catId, probId) {
+  state.screen = 'problem'; state.categoryId = catId; state.problemId = probId; state.stepIndex = 0;
+  const problem = findProblem(catId, probId);
+  initStepStates(problem);
+  render();
+}
+
+/* ---------- Crear tu propio problema ---------- */
+
+function escapeAttr(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function newStepDraft(type) {
+  return {
+    type: type || 'mc',
+    prompt: '',
+    options: ['', '', ''],
+    correctOption: 0,
+    correctValue: '',
+    tolerance: '0.01',
+    unit: '',
+    hint: ''
+  };
+}
+
+function goCreate(targetCatId) {
+  state.screen = 'create';
+  state.createTarget = targetCatId || '__new__';
+  state.createDraft = { title: '', statement: '', steps: [newStepDraft('mc')], summary: '' };
+  state.createError = '';
+  render();
+}
+
+function cancelCreate() {
+  const back = (state.createTarget && state.createTarget !== '__new__') ? state.createTarget : null;
+  state.createDraft = null;
+  if (back && findCategory(back)) { goCategory(back); } else { goHome(); }
+}
+
+function setCreateTarget(value) {
+  state.createTarget = value;
+}
+
+function updateDraftField(field, value) {
+  state.createDraft[field] = value;
+}
+
+function updateStepField(idx, field, value) {
+  state.createDraft.steps[idx][field] = value;
+}
+
+function updateStepOption(idx, optIdx, value) {
+  state.createDraft.steps[idx].options[optIdx] = value;
+}
+
+function setStepCorrectOption(idx, optIdx) {
+  state.createDraft.steps[idx].correctOption = optIdx;
+}
+
+function changeStepType(idx, type) {
+  const old = state.createDraft.steps[idx];
+  const fresh = newStepDraft(type);
+  fresh.prompt = old.prompt;
+  fresh.hint = old.hint;
+  state.createDraft.steps[idx] = fresh;
+  render();
+}
+
+function addStep() {
+  state.createDraft.steps.push(newStepDraft('mc'));
+  render();
+}
+
+function removeStep(idx) {
+  if (state.createDraft.steps.length <= 1) return;
+  state.createDraft.steps.splice(idx, 1);
+  render();
+}
+
+function saveCreate() {
+  const draft = state.createDraft;
+  const title = (draft.title || '').trim();
+  const statement = (draft.statement || '').trim();
+
+  if (!title) { state.createError = 'Escribe un título para tu problema.'; render(); return; }
+  if (!statement) { state.createError = 'Escribe el enunciado del problema.'; render(); return; }
+  if (!draft.steps.length) { state.createError = 'Agrega al menos un paso.'; render(); return; }
+
+  const finalSteps = [];
+  for (let i = 0; i < draft.steps.length; i++) {
+    const s = draft.steps[i];
+    const prompt = (s.prompt || '').trim();
+    if (!prompt) { state.createError = `Escribe la pregunta del paso ${i+1}.`; render(); return; }
+    if (s.type === 'mc') {
+      const filled = s.options.map(o => (o || '').trim()).filter(o => o !== '');
+      if (filled.length < 2) { state.createError = `El paso ${i+1} necesita al menos 2 opciones escritas.`; render(); return; }
+      const correctText = (s.options[s.correctOption] || '').trim();
+      if (!correctText) { state.createError = `Marca cuál opción es la correcta en el paso ${i+1}.`; render(); return; }
+      finalSteps.push({
+        type: 'mc',
+        prompt,
+        options: filled,
+        correct: filled.indexOf(correctText),
+        hint: (s.hint || '').trim() || 'Piensa de nuevo en el enunciado del problema.'
+      });
+    } else {
+      const correctValue = parseFloat(s.correctValue);
+      if (isNaN(correctValue)) { state.createError = `Escribe una respuesta numérica válida en el paso ${i+1}.`; render(); return; }
+      const tolerance = parseFloat(s.tolerance);
+      finalSteps.push({
+        type: 'num',
+        prompt,
+        correct: correctValue,
+        tolerance: isNaN(tolerance) ? 0.01 : tolerance,
+        unit: (s.unit || '').trim(),
+        hint: (s.hint || '').trim() || 'Repasa el enunciado y vuelve a calcular con cuidado.'
+      });
+    }
+  }
+
+  customIdCounter++;
+  const problem = {
+    id: 'custom-' + Date.now() + '-' + customIdCounter,
+    title,
+    statement,
+    steps: finalSteps,
+    summary: (draft.summary || '').trim() || '¡Bien hecho! Completaste tu propio problema.',
+    graph: null,
+    custom: true
+  };
+
+  let targetCat;
+  if (state.createTarget === '__new__' || !state.createTarget) {
+    targetCat = findCategory('personalizados');
+    if (!targetCat) {
+      targetCat = { id: 'personalizados', icon: '📝', name: 'Mis problemas', desc: 'Problemas creados por ti.', concept: null, problems: [] };
+      CATEGORIES.push(targetCat);
+    }
+  } else {
+    targetCat = findCategory(state.createTarget);
+  }
+  targetCat.problems.push(problem);
+
+  state.createDraft = null;
+  goCategory(targetCat.id);
+}
+
+function renderCreateView() {
+  const draft = state.createDraft;
+  const targetOptions = [`<option svalue="__new__" ${state.createTarget === '__new__' ? 'selected' : ''}>📝 Mis problemas (nuevo tema)</option>`]
+    .concat(CATEGORIES.map(c => `<option value="${c.id}" ${state.createTarget === c.id ? 'selected' : ''}>${c.icon} ${escapeAttr(c.name)}</option>`))
+    .join('');
+
+  let html = `
+    <button class="btn-back" onclick="cancelCreate()">← Cancelar</button>
+    <header class="top">
+      <span class="demo-badge">✏️ Crear problema</span>
+      <h1>Crea tu propio problema</h1>
+      <p class="sub">Escribe un enunciado y los pasos para resolverlo, igual que los demás problemas de la app.</p>
+    </header>
+    <div class="create-form">
+      <label class="form-label">¿En qué tema quieres guardarlo?</label>
+      <select class="form-select" onchange="setCreateTarget(this.value)">${targetOptions}</select>
+
+      <label class="form-label">Título del problema</label>
+      <input type="text" class="form-input" placeholder="Ej: El viaje en autobús" value="${escapeAttr(draft.title)}" oninput="updateDraftField('title', this.value)">
+
+      <label class="form-label">Enunciado</label>
+      <textarea class="form-textarea" placeholder="Describe la situación o problema que se debe resolver..." oninput="updateDraftField('statement', this.value)">${escapeHtml(draft.statement)}</textarea>
+
+      <h3 class="form-section-title">Pasos guiados</h3>
+  `;
+
+  draft.steps.forEach((step, idx) => {
+    html += renderStepEditor(step, idx, draft.steps.length);
+  });
+
+  html += `
+      <button class="btn-secondary" onclick="addStep()">+ Agregar paso</button>
+
+      <label class="form-label" style="margin-top:18px;">Resumen o solución completa (opcional)</label>
+      <textarea class="form-textarea" placeholder="Explica la solución completa que se mostrará al terminar..." oninput="updateDraftField('summary', this.value)">${escapeHtml(draft.summary)}</textarea>
+
+      ${state.createError ? `<div class="feedback bad show" style="margin-top:12px;">✗ ${escapeHtml(state.createError)}</div>` : ''}
+
+      <p class="create-note">Nota: los problemas que crees se guardan solo mientras esta página siga abierta en tu navegador; si la recargas o la cierras, se perderán.</p>
+
+      <div class="actions-row">
+        <button class="btn-secondary" onclick="cancelCreate()">Cancelar</button>
+        <button class="btn-primary" onclick="saveCreate()">Guardar problema</button>
+      </div>
+    </div>
+  `;
+
+  app.innerHTML = html;
+}
+
+function renderStepEditor(step, idx, totalSteps) {
+  let inner = '';
+  if (step.type === 'mc') {
+    inner = step.options.map((opt, i) => `
+      <div class="mc-option-row">
+        <input type="radio" name="correct-${idx}" ${step.correctOption === i ? 'checked' : ''} onchange="setStepCorrectOption(${idx}, ${i})">
+        <input type="text" class="form-input" placeholder="Opción ${i+1}${i < 2 ? '' : ' (opcional)'}" value="${escapeAttr(opt)}" oninput="updateStepOption(${idx}, ${i}, this.value)">
+      </div>
+    `).join('') + `<p class="step-editor-help">Marca con el círculo cuál opción es la correcta.</p>`;
+  } else {
+    inner = `
+      <div class="num-editor-row">
+        <input type="number" step="any" class="form-input" placeholder="Respuesta correcta" value="${escapeAttr(step.correctValue)}" oninput="updateStepField(${idx}, 'correctValue', this.value)">
+        <input type="number" step="any" class="form-input" placeholder="Tolerancia (ej. 0.01)" value="${escapeAttr(step.tolerance)}" oninput="updateStepField(${idx}, 'tolerance', this.value)">
+        <input type="text" class="form-input" placeholder="Unidad (opcional, ej. km)" value="${escapeAttr(step.unit)}" oninput="updateStepField(${idx}, 'unit', this.value)">
+      </div>
+    `;
+  }
+
+  return `
+    <div class="step-editor">
+      <div class="step-editor-head">
+        <strong>Paso ${idx + 1}</strong>
+        <select class="form-select-inline" onchange="changeStepType(${idx}, this.value)">
+          <option value="mc" ${step.type === 'mc' ? 'selected' : ''}>Opción múltiple</option>
+          <option value="num" ${step.type === 'num' ? 'selected' : ''}>Respuesta numérica</option>
+        </select>
+        ${totalSteps > 1 ? `<button class="btn-secondary step-remove-btn" onclick="removeStep(${idx})">Eliminar</button>` : ''}
+      </div>
+      <input type="text" class="form-input" placeholder="Pregunta de este paso" value="${escapeAttr(step.prompt)}" oninput="updateStepField(${idx}, 'prompt', this.value)">
+      ${inner}
+      <input type="text" class="form-input" placeholder="Pista (opcional)" value="${escapeAttr(step.hint)}" oninput="updateStepField(${idx}, 'hint', this.value)">
+    </div>
+  `;
+}
+
+function renderProblemView() {
+  const problem = findProblem(state.categoryId, state.problemId);
+  const cat = findCategory(state.categoryId);
+  const totalSteps = problem.steps.length;
+  const allDone = state.stepIndex >= totalSteps;
+
+  let html = `
+    <button class="btn-back" onclick="goCategory('${cat.id}')">← Volver a ${cat.name}</button>
+    <div class="statement-box">
+      <h2>${problem.title}</h2>
+      <p>${problem.statement}</p>
+    </div>
+    <div class="step-progress">
+  `;
+  for (let i = 0; i < totalSteps; i++) {
+    let cls = 'step-dot';
+    if (i < state.stepIndex || (allDone)) cls += ' past';
+    else if (i === state.stepIndex) cls += ' current';
+    html += `<div class="${cls}"></div>`;
+  }
+  html += `</div>`;
+
+  // Past answered steps (recap)
+  for (let i = 0; i < Math.min(state.stepIndex, totalSteps); i++) {
+    const st = problem.steps[i];
+    const ss = state.stepStates[i];
+    const answerText = st.type === 'mc' ? st.options[ss.chosenIndex] : `${ss.chosenValue} ${st.unit || ''}`.trim();
+    html += `
+      <div class="past-step">
+        <div class="ps-q">${i+1}. ${st.prompt}</div>
+        <div class="ps-a">✓ ${answerText}</div>
+        ${(st.explain || st.hint) ? `<div class="ps-explain">💡 ${st.explain || st.hint}</div>` : ''}
+      </div>
+    `;
+  }
+
+  if (!allDone) {
+    const idx = state.stepIndex;
+    const step = problem.steps[idx];
+    const ss = state.stepStates[idx];
+    html += `
+      <div class="step-card">
+        <div class="step-label">Paso ${idx+1} de ${totalSteps}</div>
+        <p class="step-prompt">${step.prompt}</p>
+        ${renderStepInput(step, ss, idx)}
+        <div class="feedback ${ss.attempts > 0 ? 'show' : ''} ${ss.correct ? 'ok' : (ss.attempts > 0 ? 'bad' : '')}" id="feedback-${idx}">
+          ${ss.correct ? '✓ ¡Correcto!' : (ss.attempts > 0 ? '✗ No es correcto todavía. Intenta de nuevo o revisa la pista.' : '')}
+        </div>
+        ${ss.correct
+          ? `<div class="explain-box">💡 <strong>Explicación:</strong> ${step.explain || step.hint}</div>`
+          : `<div class="hint-row">
+              <button class="hint-link" onclick="toggleHint(${idx})">💡 ${ss.hintShown ? 'Ocultar pista' : 'Ver pista'}</button>
+              <div class="hint-box ${ss.hintShown ? 'show' : ''}" id="hintbox-${idx}">${step.hint}</div>
+            </div>`
+        }
+      </div>
+      <div class="actions-row">
+        <span></span>
+        <button class="btn-primary" id="next-btn" ${ss.correct ? '' : 'disabled'} onclick="nextStep()">
+          ${idx === totalSteps - 1 ? 'Ver solución completa' : 'Siguiente paso'}
+        </button>
+      </div>
+    `;
+  } else {
+    html += `
+      <div class="summary-box">
+        <div class="tag">✓ ¡Problema resuelto!</div>
+        <p>${problem.summary}</p>
+        ${problem.graph ? renderGraphBlock(problem.graph) : ''}
+      </div>
+      <footer class="done-footer">
+        <button class="btn-secondary" onclick="goCategory('${cat.id}')">Volver a ${cat.name}</button>
+      </footer>
+    `;
+  }
+
+  app.innerHTML = html;
+
+  if (allDone) {
+    completed.add(problem.id);
+    if (problem.graph) drawGraphForCurrentProblem(problem.graph);
+  }
+}
+
+function renderWorkArea(ss, idx) {
+  return `
+    <div class="work-area">
+      <label class="work-label" for="work-${idx}">✏️ Espacio para resolver (borrador, opcional)</label>
+      <textarea class="work-textarea" id="work-${idx}" placeholder="Escribe aquí tus cálculos, como en papel..." oninput="saveWork(${idx}, this.value)">${escapeHtml(ss.workText || '')}</textarea>
+    </div>
+  `;
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function saveWork(idx, value) {
+  state.stepStates[idx].workText = value;
+  // No se vuelve a renderizar aquí para no perder el foco mientras se escribe.
+}
+
+function renderStepInput(step, ss, idx) {
+  const workArea = renderWorkArea(ss, idx);
+  if (step.type === 'mc') {
+    let html = workArea + '<div class="options">';
+    step.options.forEach((opt, i) => {
+      let cls = 'option-btn';
+      if (ss.answered) {
+        cls += ' disabled-choice';
+        if (i === step.correct) cls += ' correct';
+        else if (i === ss.chosenIndex) cls += ' wrong';
+      }
+      html += `<button class="${cls}" onclick="answerMC(${idx}, ${i})">${opt}</button>`;
+    });
+    html += '</div>';
+    return html;
+  } else {
+    const unit = step.unit ? `<span class="unit-label">${step.unit}</span>` : '';
+    return `
+      ${workArea}
+      <div class="num-input-row">
+        <input type="number" step="any" id="numinput-${idx}" placeholder="tu respuesta" value="${ss.chosenValue !== null ? ss.chosenValue : ''}" ${ss.answered ? 'disabled' : ''}>
+        ${unit}
+        <button class="btn-secondary" ${ss.answered ? 'disabled' : ''} onclick="answerNum(${idx})">Comprobar</button>
+      </div>
+    `;
+  }
+}
+
+function toggleHint(idx) {
+  state.stepStates[idx].hintShown = !state.stepStates[idx].hintShown;
+  render();
+}
+
+function answerMC(idx, chosenIndex) {
+  const problem = findProblem(state.categoryId, state.problemId);
+  const step = problem.steps[idx];
+  const ss = state.stepStates[idx];
+  if (ss.correct) return;
+  ss.attempts++;
+  ss.chosenIndex = chosenIndex;
+  if (chosenIndex === step.correct) {
+    ss.correct = true;
+    ss.answered = true;
+  }
+  render();
+}
+
+function answerNum(idx) {
+  const problem = findProblem(state.categoryId, state.problemId);
+  const step = problem.steps[idx];
+  const ss = state.stepStates[idx];
+  const input = document.getElementById('numinput-' + idx);
+  const val = parseFloat(input.value);
+  ss.attempts++;
+  if (!isNaN(val)) {
+    ss.chosenValue = val;
+    const tol = step.tolerance !== undefined ? step.tolerance : 0.01;
+    if (Math.abs(val - step.correct) <= tol) {
+      ss.correct = true;
+      ss.answered = true;
+    }
+  }
+  render();
+}
+
+function nextStep() {
+  state.stepIndex++;
+  render();
+}
+
+/* ---------- Gráficas (canvas) ---------- */
+
+function renderGraphBlock(graph) {
+  return `
+    <div class="graph-wrap">
+      <h4>Gráfica de la función</h4>
+      <canvas class="graph-canvas" id="fn-canvas"></canvas>
+      <div class="graph-legend">
+        <div class="item"><span class="legend-swatch" style="background:var(--series-1)"></span> Función</div>
+        <div class="item"><span class="legend-swatch" style="background:var(--series-2)"></span> Punto clave</div>
+      </div>
+    </div>
+  `;
+}
+
+function cssVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function drawGraphForCurrentProblem(graph) {
+  const canvas = document.getElementById('fn-canvas');
+  if (!canvas) return;
+
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const W = rect.width, H = rect.height;
+  const pad = { top: 16, right: 20, bottom: 34, left: 46 };
+
+  const colorGrid = cssVar('--grid') || '#e1e0d9';
+  const colorAxis = cssVar('--baseline') || '#c3c2b7';
+  const colorMuted = cssVar('--muted') || '#898781';
+  const colorText = cssVar('--text-secondary') || '#52514e';
+  const colorSeries1 = cssVar('--series-1') || '#2a78d6';
+  const colorSeries2 = cssVar('--series-2') || '#eb6834';
+  const colorSurface = cssVar('--surface-1') || '#fcfcfb';
+
+  // sample function
+  const N = 200;
+  const xs = [];
+  const ys = [];
+  for (let i = 0; i <= N; i++) {
+    const x = graph.xMin + (graph.xMax - graph.xMin) * (i / N);
+    xs.push(x);
+    ys.push(graph.fn(x));
+  }
+  let yMin = Math.min(...ys, 0);
+  let yMax = Math.max(...ys, 0);
+  if (graph.points) graph.points.forEach(p => { yMin = Math.min(yMin, p.y); yMax = Math.max(yMax, p.y); });
+  const yPad = (yMax - yMin) * 0.12 || 1;
+  yMin -= yPad; yMax += yPad;
+
+  function toPx(x) { return pad.left + (x - graph.xMin) / (graph.xMax - graph.xMin) * (W - pad.left - pad.right); }
+  function toPy(y) { return H - pad.bottom - (y - yMin) / (yMax - yMin) * (H - pad.top - pad.bottom); }
+
+  function drawBase() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = colorSurface;
+    ctx.fillRect(0, 0, W, H);
+
+    // gridlines (horizontal)
+    ctx.strokeStyle = colorGrid;
+    ctx.lineWidth = 1;
+    const rows = 5;
+    ctx.font = '11px system-ui, sans-serif';
+    ctx.fillStyle = colorMuted;
+    for (let i = 0; i <= rows; i++) {
+      const y = yMin + (yMax - yMin) * (i / rows);
+      const py = toPy(y);
+      ctx.beginPath();
+      ctx.moveTo(pad.left, py);
+      ctx.lineTo(W - pad.right, py);
+      ctx.stroke();
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(y.toFixed(y % 1 === 0 ? 0 : 1), pad.left - 8, py);
+    }
+    // x axis ticks
+    const cols = 6;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (let i = 0; i <= cols; i++) {
+      const x = graph.xMin + (graph.xMax - graph.xMin) * (i / cols);
+      const px = toPx(x);
+      ctx.fillText(x.toFixed(x % 1 === 0 ? 0 : 1), px, H - pad.bottom + 8);
+    }
+
+    // baseline (y=0) if within range
+    if (yMin < 0 && yMax > 0) {
+      ctx.strokeStyle = colorAxis;
+      ctx.lineWidth = 1.5;
+      const py0 = toPy(0);
+      ctx.beginPath();
+      ctx.moveTo(pad.left, py0);
+      ctx.lineTo(W - pad.right, py0);
+      ctx.stroke();
+    }
+    // y axis baseline
+    ctx.strokeStyle = colorAxis;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top);
+    ctx.lineTo(pad.left, H - pad.bottom);
+    ctx.stroke();
+
+    // curve
+    ctx.strokeStyle = colorSeries1;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    xs.forEach((x, i) => {
+      const px = toPx(x), py = toPy(ys[i]);
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+
+    // key points
+    if (graph.points) {
+      graph.points.forEach(p => {
+        const px = toPx(p.x), py = toPy(p.y);
+        ctx.fillStyle = colorSeries2;
+        ctx.beginPath();
+        ctx.arc(px, py, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = colorSurface;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      });
+    }
+
+    // axis labels
+    ctx.fillStyle = colorText;
+    ctx.font = '12px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(graph.xLabel || '', W / 2, H - 4);
+  }
+
+  function drawHover(mx) {
+    drawBase();
+    const relX = (mx - pad.left) / (W - pad.left - pad.right);
+    if (relX < 0 || relX > 1) return;
+    const x = graph.xMin + (graph.xMax - graph.xMin) * relX;
+    const y = graph.fn(x);
+    const px = toPx(x), py = toPy(y);
+
+    ctx.strokeStyle = colorMuted;
+    ctx.setLineDash([3, 3]);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(px, pad.top);
+    ctx.lineTo(px, H - pad.bottom);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = colorSeries1;
+    ctx.beginPath();
+    ctx.arc(px, py, 4, 0, Math.PI * 2);
+    ctx.fill();
+
+    const label = `(${x.toFixed(1)}, ${y.toFixed(1)})`;
+    ctx.font = '12px system-ui, sans-serif';
+    const tw = ctx.measureText(label).width;
+    let boxX = px + 8;
+    if (boxX + tw + 12 > W - pad.right) boxX = px - tw - 20;
+    const boxY = Math.max(pad.top, py - 24);
+    ctx.fillStyle = colorSeries1;
+    ctx.fillRect(boxX, boxY, tw + 12, 20);
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, boxX + 6, boxY + 10);
+  }
+
+  drawBase();
+  canvas.onmousemove = (e) => {
+    const r = canvas.getBoundingClientRect();
+    drawHover(e.clientX - r.left);
+  };
+  canvas.onmouseleave = () => drawBase();
+}
+
+render();
+</script>
+</body>
+</html>
