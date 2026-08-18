@@ -361,6 +361,76 @@ const CATEGORIES = [
     ]
   },
   {
+    id: 'inecuaciones',
+    icon: '📏',
+    name: 'Inecuaciones',
+    desc: 'Plantea y resuelve inecuaciones lineales a partir de problemas cotidianos.',
+    concept: '<p><strong>Inecuación:</strong> una desigualdad (&lt;, &gt;, ≤, ≥) donde la incógnita x aparece sin exponentes. Se resuelve igual que una ecuación, despejando x, con una diferencia clave: <strong>si multiplicas o divides ambos lados por un número negativo, el sentido de la desigualdad se invierte.</strong> La solución suele ser un rango de valores, no un único número.</p>',
+    problems: [
+      {
+        id: 'inec-presupuesto',
+        title: 'El presupuesto del evento',
+        statement: 'Estás organizando un evento. El salón cuesta $150 fijos más $8 por cada invitado. Tu presupuesto máximo es de $550. ¿Cuál es el mayor número de invitados que puedes tener?',
+        steps: [
+          {
+            type: 'mc',
+            prompt: 'Si x = número de invitados, ¿cuál inecuación representa la situación?',
+            options: ['150 + 8x ≤ 550', '150 + 8x ≥ 550', '150x + 8 ≤ 550'],
+            correct: 0,
+            hint: 'El costo total no puede superar el presupuesto máximo, así que debe ser menor o igual (≤) a 550.'
+          },
+          {
+            type: 'mc',
+            prompt: 'Para despejar x en 150 + 8x ≤ 550, ¿qué operación haces primero?',
+            options: ['Multiplicar ambos lados por 8', 'Restar 150 en ambos lados', 'Dividir ambos lados entre 150'],
+            correct: 1,
+            hint: 'Primero aísla el término con x restando la constante que lo acompaña.'
+          },
+          {
+            type: 'num',
+            prompt: 'Resuelve 8x ≤ 400 y encuentra el máximo valor entero de x.',
+            correct: 50,
+            tolerance: 0.1,
+            unit: 'invitados',
+            hint: 'Divide ambos lados entre 8: x ≤ 400/8. Como divides entre un número positivo, la desigualdad no cambia de sentido.'
+          }
+        ],
+        summary: 'De <span class="eq">150 + 8x ≤ 550</span> restamos 150: <span class="eq">8x ≤ 400</span>, y dividiendo entre 8 (positivo, no se invierte): <span class="eq">x ≤ 50</span>. Puedes invitar como máximo a <strong>50 personas</strong>.',
+        graph: null
+      },
+      {
+        id: 'inec-signo',
+        title: 'La regla del signo que cambia',
+        statement: 'Resuelve la inecuación −3x + 6 > 18 y presta atención a qué pasa con el signo de la desigualdad.',
+        steps: [
+          {
+            type: 'num',
+            prompt: 'Resta 6 en ambos lados de −3x + 6 > 18. ¿Qué queda del lado derecho?',
+            correct: 12,
+            tolerance: 0.1,
+            hint: '18 − 6 = 12, así que queda −3x > 12.'
+          },
+          {
+            type: 'mc',
+            prompt: 'Para despejar x en −3x > 12 debes dividir entre −3. ¿Qué ocurre con el signo de la desigualdad?',
+            options: ['Se mantiene igual (>)', 'Se invierte (queda <)', 'Desaparece y queda una igualdad'],
+            correct: 1,
+            hint: 'Regla clave de las inecuaciones: al multiplicar o dividir por un número negativo, el signo de la desigualdad se invierte.'
+          },
+          {
+            type: 'num',
+            prompt: 'Divide −3x > 12 entre −3 (invirtiendo el signo) y da el valor límite de x.',
+            correct: -4,
+            tolerance: 0.1,
+            hint: 'x < 12/(−3) = −4.'
+          }
+        ],
+        summary: 'Restando 6: <span class="eq">−3x > 12</span>. Al dividir entre −3, el signo se invierte: <span class="eq">x < −4</span>. La solución es todo x menor que −4, no un único valor.',
+        graph: null
+      }
+    ]
+  },
+  {
     id: 'sistemas',
     icon: '⚖️',
     name: 'Sistemas de ecuaciones',
